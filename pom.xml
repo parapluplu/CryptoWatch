@@ -2,7 +2,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.paraplu.cryptocurrency</groupId>
-	<artifactId>sync-master</artifactId>
+	<artifactId>zeus</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<properties>
@@ -10,10 +10,8 @@
 		<maven.compiler.target>1.8</maven.compiler.target>
 	</properties>
 	<modules>
-		<module>sync-common</module>
-		<module>sync-current</module>
-		<module>sync-past</module>
-		<module>sync-past-scheduler</module>
+		<module>zeus-common</module>
+		<module>sync</module>
 	</modules>
 
 	<dependencyManagement>
@@ -39,7 +37,7 @@
 			</dependency>
 			<dependency>
 				<groupId>de.paraplu.cryptocurrency</groupId>
-				<artifactId>sync-common</artifactId>
+				<artifactId>zeus-common</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 		</dependencies>
