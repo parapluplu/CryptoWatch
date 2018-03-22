@@ -1,0 +1,9 @@
+management:
+   endpoint:
+      health:
+        show-details: "ALWAYS"
+
+spring.data.mongodb:
+  database: ethdb
+web3j:
+  httpTimeoutSeconds: 0 
