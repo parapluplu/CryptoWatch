@@ -12,6 +12,7 @@
 	<modules>
 		<module>zeus-common</module>
 		<module>sync</module>
+		<module>config-server</module>
 	</modules>
 
 	<dependencyManagement>

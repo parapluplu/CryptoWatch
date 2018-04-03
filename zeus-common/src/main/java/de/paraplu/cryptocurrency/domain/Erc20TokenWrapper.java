@@ -245,7 +245,7 @@ public final class Erc20TokenWrapper extends Contract {
         return executeCallSingleValueReturn(function);
     }
 
-    public Future<Utf8String> symbol() throws IOException {
+    public Utf8String symbol() throws IOException {
         Function function = new Function(
                 "symbol",
                 Arrays.<Type>asList(),

@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import de.paraplu.cryptocurrency.domain.mongodb.pojo.SyncStatusInfo;
+import de.paraplu.cryptocurrency.sync.service.SyncServiceException;
+import de.paraplu.cryptocurrency.sync.service.SyncServiceManager;
 
 @RestController
 public class SyncPastController {
@@ -20,8 +22,6 @@ public class SyncPastController {
         @NotNull
         @Min(0)
         private BigInteger from;
-        @NotNull
-        private BigInteger to;
         @NotNull
         private String     address;
 
@@ -33,20 +33,12 @@ public class SyncPastController {
             return from;
         }
 
-        public BigInteger getTo() {
-            return to;
-        }
-
         public void setAddress(String address) {
             this.address = address;
         }
 
         public void setFrom(BigInteger from) {
             this.from = from;
-        }
-
-        public void setTo(BigInteger to) {
-            this.to = to;
         }
     }
 
@@ -55,6 +47,6 @@ public class SyncPastController {
 
     @RequestMapping(value = "/sync", method = RequestMethod.POST)
     public SyncStatusInfo sync(@RequestBody SyncRequest syncRequest) throws SyncServiceException {
-        return syncServiceManager.sync(syncRequest.getFrom(), syncRequest.getTo(), syncRequest.getAddress());
+        return syncServiceManager.sync(syncRequest.getFrom(), syncRequest.getAddress());
     }
 }

@@ -1,12 +1,16 @@
-package de.paraplu.cryptocurrency.sync;
+package de.paraplu.cryptocurrency.sync.service;
 
+import java.io.IOException;
 import java.math.BigInteger;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.stream.messaging.Source;
+import org.springframework.messaging.support.GenericMessage;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StopWatch;
@@ -14,14 +18,15 @@ import org.web3j.protocol.Web3j;
 import org.web3j.tx.ClientTransactionManager;
 
 import de.paraplu.cryptocurrency.domain.Erc20TokenWrapper;
-import de.paraplu.cryptocurrency.domain.Erc20TokenWrapper.TransferEventResponse;
+import de.paraplu.cryptocurrency.domain.TransferMessage;
 import de.paraplu.cryptocurrency.domain.mongodb.pojo.SyncStatusInfo;
+import de.paraplu.cryptocurrency.domain.mongodb.pojo.TokenInfo;
 import de.paraplu.cryptocurrency.domain.mongodb.pojo.meta.SyncStatus;
 import de.paraplu.cryptocurrency.domain.mongodb.repository.SyncStatusInfoRepository;
+import de.paraplu.cryptocurrency.domain.mongodb.repository.TokenInfoRepository;
 import de.paraplu.cryptocurrency.domain.neo4j.pojo.Address;
-import de.paraplu.cryptocurrency.domain.neo4j.repository.AddressRepository;
-import de.paraplu.cryptocurrency.util.Web3Util;
-import rx.functions.Func1;
+import de.paraplu.cryptocurrency.domain.neo4j.pojo.Transfer;
+import de.paraplu.cryptocurrency.sync.util.Web3Util;
 
 @Component
 public class SyncService {
@@ -31,13 +36,25 @@ public class SyncService {
     @Autowired
     private SyncStatusInfoRepository syncStatusInfoRepository;
     @Autowired
-    private AddressRepository        addressRepository;
+    private TokenInfoRepository      tokenInfoRepository;
+
+    @Autowired
+    private Source                   source;
 
     @Autowired
     private Web3j                    web3;
 
     @Value(value = "${sync.batchSize}")
     private BigInteger               batchSize;
+
+    private void saveTokenInfo(Erc20TokenWrapper erc20TokenWrapper)
+            throws InterruptedException, ExecutionException, IOException {
+        String symbol = erc20TokenWrapper.symbol().getValue();
+        BigInteger decimals = erc20TokenWrapper.decimals().getValue();
+        String address = erc20TokenWrapper.getContractAddress();
+        TokenInfo tokenInfo = new TokenInfo(address, symbol, decimals);
+        tokenInfoRepository.save(tokenInfo);
+    }
 
     @Async
     public void sync(SyncStatusInfo syncStatusInfo) throws SyncServiceException {
@@ -51,57 +68,42 @@ public class SyncService {
                     transactionManager,
                     BigInteger.ZERO,
                     BigInteger.ZERO);
-            StopWatch sw = new StopWatch("past-sync");
+            StopWatch sw = new StopWatch("sync");
             sw.start();
             syncStatusInfo.setStatus(SyncStatus.SYNCING);
             syncStatusInfoRepository.save(syncStatusInfo);
             BigInteger first = syncStatusInfo.getFrom();
             BigInteger last = syncStatusInfo.getTo();
             final AtomicBoolean successFlag = new AtomicBoolean(true);
+
+            try {
+                saveTokenInfo(erc20TokenWrapper);
+            } catch (ExecutionException | IOException e) {
+                syncStatusInfo.setStatus(SyncStatus.ABORTED);
+                String msg = "Unable to retrieve token details. Won't start syncing";
+                LOGGER.error(msg, e);
+                throw new SyncServiceException(msg, e);
+            }
+
             for (BigInteger from = first; from.compareTo(last) == -1; from = from.add(batchSize)) {
                 BigInteger to = from.add(batchSize);
                 if (to.compareTo(last) == 1) {
                     to = last;
                 }
                 System.out.println("SYNC " + from + " - " + to);
-                // erc20TokenWrapper
-                // .approvalEventObservable(Web3Util.block(from), Web3Util.block(to))
-                // .takeWhile(new Func1<ApprovalEventResponse, Boolean>() {
-                // @Override
-                // public Boolean call(ApprovalEventResponse approval) {
-                // LOGGER.info("takewhile");
-                // int compareTo = approval._block.compareTo(syncStatusInfo.getTo());
-                // return compareTo < 1;
-                // }
-                // })
-                // .doOnError(exception -> {
-                // LOGGER.error("Exception while syncing", exception);
-                // })
-                // .doOnSubscribe(() -> {
-                // LOGGER.info("START");
-                // })
-                // .doOnCompleted(() -> {
-                // System.out.println("DONE");
-                // })
-                // .toBlocking()
-                // .subscribe(approval -> {
-                // LOGGER.info(
-                // approval._owner.getValue() + "\n" + approval._spender.getValue() + "\n"
-                // + approval._value.getValue());
-                // });
                 erc20TokenWrapper
                         .transferEventObservable(Web3Util.block(from), Web3Util.block(to))
-                        .takeWhile(new Func1<TransferEventResponse, Boolean>() {
-                            @Override
-                            public Boolean call(TransferEventResponse txnForCheck) {
-                                if (syncStatusInfo.getTo() == null) {
-                                    // null value for to indicates that syncing should be done forever
-                                    return true;
-                                }
-                                int compareTo = txnForCheck._block.compareTo(syncStatusInfo.getTo());
-                                return compareTo < 1;
-                            }
-                        })
+                        // .takeWhile(new Func1<TransferEventResponse, Boolean>() {
+                        // @Override
+                        // public Boolean call(TransferEventResponse txnForCheck) {
+                        // if (syncStatusInfo.getTo() == null) {
+                        // // null value for to indicates that syncing should be done forever
+                        // return true;
+                        // }
+                        // int compareTo = txnForCheck._block.compareTo(syncStatusInfo.getTo());
+                        // return compareTo < 1;
+                        // }
+                        // })
                         .doOnError(exception -> {
                             successFlag.set(false);
                             sw.stop();
@@ -123,44 +125,27 @@ public class SyncService {
                             syncStatusInfo.setCurrentBlock(txn._block);
                             Address sendFrom = new Address(txn._from.getValue());
                             Address sendTo = new Address(txn._to.getValue());
-                            sendFrom.transfer(
+                            Transfer transfer = sendFrom.transfer(
                                     sendTo,
                                     syncStatusInfo.getContractAdress(),
                                     txn._value.getValue(),
                                     txn._transactionHash,
                                     txn._block);
-                            addressRepository.save(sendFrom);
+                            TransferMessage transferMessage = new TransferMessage(transfer);
+                            source.output().send(new GenericMessage<>(transferMessage));
+                            syncStatusInfo.setCurrentBlock(txn._block);
                             syncStatusInfoRepository.save(syncStatusInfo);
                         });
             }
-            // Event event = new Event("Transfer", Collections.emptyList(),
-            // Collections.emptyList());
-            // EthFilter ethFilter = new EthFilter(
-            // block(syncStatusInfo.getFrom()),
-            // block(syncStatusInfo.getTo()),
-            // syncStatusInfo.getContractAdress());
-            // // String encodedEventSignature = EventEncoder.encode(event);
-            // ethFilter.addSingleTopic("0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef");
-            // EthLog logs = web3.ethGetLogs(ethFilter).send();
-            // for (LogResult<?> log : logs.getResult()) {
-            // Object result = log.get();
-            // if (log instanceof Log) {
-            // Log l = (Log) result;
-            // } else {
-            // System.out.println("OTHER CLASS");
-            // System.out.println(log.getClass());
-            // System.out.println(log);
-            // }
-            // }
             if (successFlag.get()) {
                 sw.stop();
                 syncStatusInfo.setDurationInMilliseconds(sw.getLastTaskTimeMillis());
                 syncStatusInfo.setStatus(SyncStatus.FINISHED);
             }
-        } catch (Exception e) {
-            LOGGER.error("Exception while syncing " + syncStatusInfo, e);
+        } catch (InterruptedException e) {
+            LOGGER.warn("Syncing process got interrupted for " + syncStatusInfo);
             syncStatusInfo.setStatus(SyncStatus.ABORTED);
-            throw e;
+            // no need to rethrow, since we are in an async method
         } finally {
             syncStatusInfoRepository.save(syncStatusInfo);
         }

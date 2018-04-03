@@ -1,4 +1,4 @@
-package de.paraplu.cryptocurrency.util;
+package de.paraplu.cryptocurrency.sync.util;
 
 import java.math.BigInteger;
 

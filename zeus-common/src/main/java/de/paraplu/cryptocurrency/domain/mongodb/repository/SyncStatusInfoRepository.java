@@ -13,10 +13,6 @@ import de.paraplu.cryptocurrency.domain.mongodb.pojo.meta.SyncStatus;
 @Repository
 public interface SyncStatusInfoRepository extends MongoRepository<SyncStatusInfo, UUID> {
 
-    // List<SyncStatusInfo> findFromGreaterThanEqualAndToLessThanEqual(long
-    // fromBlock, long toBlock);
-
-    Optional<SyncStatusInfo> fromGreaterThanEqualAndToLessThanEqualAndStatusNotIn(BigInteger fromBlock,
-            BigInteger toBlock, SyncStatus[] notSyncing);
+    Optional<SyncStatusInfo> fromGreaterThanEqualAndStatusNotIn(BigInteger fromBlock, SyncStatus[] notSyncing);
 
 }
