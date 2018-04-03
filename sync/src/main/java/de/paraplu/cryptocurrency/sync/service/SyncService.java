@@ -84,68 +84,70 @@ public class SyncService {
                 LOGGER.error(msg, e);
                 throw new SyncServiceException(msg, e);
             }
-
-            for (BigInteger from = first; from.compareTo(last) == -1; from = from.add(batchSize)) {
-                BigInteger to = from.add(batchSize);
-                if (to.compareTo(last) == 1) {
-                    to = last;
-                }
-                System.out.println("SYNC " + from + " - " + to);
-                erc20TokenWrapper
-                        .transferEventObservable(Web3Util.block(from), Web3Util.block(to))
-                        // .takeWhile(new Func1<TransferEventResponse, Boolean>() {
-                        // @Override
-                        // public Boolean call(TransferEventResponse txnForCheck) {
-                        // if (syncStatusInfo.getTo() == null) {
-                        // // null value for to indicates that syncing should be done forever
-                        // return true;
-                        // }
-                        // int compareTo = txnForCheck._block.compareTo(syncStatusInfo.getTo());
-                        // return compareTo < 1;
-                        // }
-                        // })
-                        .doOnError(exception -> {
-                            successFlag.set(false);
-                            sw.stop();
-                            sw.getLastTaskTimeMillis();
-                            LOGGER.error("Exception while syncing " + syncStatusInfo, exception);
-                            syncStatusInfo.setStatus(SyncStatus.ABORTED);
-                            syncStatusInfoRepository.save(syncStatusInfo);
-                        })
-                        .doOnCompleted(() -> {
-                            System.out.println("DONE REAL");
-                            syncStatusInfo.setCurrentBlock(syncStatusInfo.getTo());
-                            syncStatusInfoRepository.save(syncStatusInfo);
-                        })
-                        .doOnSubscribe(() -> {
-                            System.out.println("START REAL");
-                        })
-                        .toBlocking()
-                        .subscribe(txn -> {
-                            syncStatusInfo.setCurrentBlock(txn._block);
-                            Address sendFrom = new Address(txn._from.getValue());
-                            Address sendTo = new Address(txn._to.getValue());
-                            Transfer transfer = sendFrom.transfer(
-                                    sendTo,
-                                    syncStatusInfo.getContractAdress(),
-                                    txn._value.getValue(),
-                                    txn._transactionHash,
-                                    txn._block);
-                            TransferMessage transferMessage = new TransferMessage(transfer);
-                            source.output().send(new GenericMessage<>(transferMessage));
-                            syncStatusInfo.setCurrentBlock(txn._block);
-                            syncStatusInfoRepository.save(syncStatusInfo);
-                        });
-            }
-            if (successFlag.get()) {
-                sw.stop();
-                syncStatusInfo.setDurationInMilliseconds(sw.getLastTaskTimeMillis());
-                syncStatusInfo.setStatus(SyncStatus.FINISHED);
-            }
+            //
+            // for (BigInteger from = first; from.compareTo(last) == -1; from =
+            // from.add(batchSize)) {
+            BigInteger to = first.add(batchSize);
+            System.out.println("SYNC " + first + " - " + to);
+            erc20TokenWrapper
+                    .transferEventObservable(Web3Util.block(first), Web3Util.block(to))
+                    // .takeWhile(new Func1<TransferEventResponse, Boolean>() {
+                    // @Override
+                    // public Boolean call(TransferEventResponse txnForCheck) {
+                    // if (syncStatusInfo.getTo() == null) {
+                    // // null value for to indicates that syncing should be done forever
+                    // return true;
+                    // }
+                    // int compareTo = txnForCheck._block.compareTo(syncStatusInfo.getTo());
+                    // return compareTo < 1;
+                    // }
+                    // })
+                    .doOnError(exception -> {
+                        successFlag.set(false);
+                        sw.stop();
+                        sw.getLastTaskTimeMillis();
+                        LOGGER.error("Exception while syncing " + syncStatusInfo, exception);
+                        syncStatusInfo.setStatus(SyncStatus.ABORTED);
+                        syncStatusInfoRepository.save(syncStatusInfo);
+                    })
+                    .doOnCompleted(() -> {
+                        System.out.println("DONE REAL");
+                        syncStatusInfo.setCurrentBlock(syncStatusInfo.getTo());
+                        syncStatusInfoRepository.save(syncStatusInfo);
+                    })
+                    .doOnSubscribe(() -> {
+                        System.out.println("START REAL");
+                    })
+                    .toBlocking()
+                    .subscribe(txn -> {
+                        syncStatusInfo.setCurrentBlock(txn._block);
+                        Address sendFrom = new Address(txn._from.getValue());
+                        Address sendTo = new Address(txn._to.getValue());
+                        Transfer transfer = sendFrom.transfer(
+                                sendTo,
+                                syncStatusInfo.getContractAdress(),
+                                txn._value.getValue(),
+                                txn._transactionHash,
+                                txn._block);
+                        TransferMessage transferMessage = new TransferMessage(transfer);
+                        source.output().send(new GenericMessage<>(transferMessage));
+                        syncStatusInfo.setCurrentBlock(txn._block);
+                        syncStatusInfoRepository.save(syncStatusInfo);
+                    });
+            // }
+            // if (successFlag.get()) {
+            // sw.stop();
+            // syncStatusInfo.setDurationInMilliseconds(sw.getLastTaskTimeMillis());
+            // syncStatusInfo.setStatus(SyncStatus.FINISHED);
+            // }
         } catch (InterruptedException e) {
             LOGGER.warn("Syncing process got interrupted for " + syncStatusInfo);
             syncStatusInfo.setStatus(SyncStatus.ABORTED);
             // no need to rethrow, since we are in an async method
+        } catch (Exception e) {
+            syncStatusInfo.setStatus(SyncStatus.ABORTED);
+            LOGGER.error("Error while syncing", e);
+            throw e;
         } finally {
             syncStatusInfoRepository.save(syncStatusInfo);
         }

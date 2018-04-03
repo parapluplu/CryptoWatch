@@ -6,5 +6,3 @@ management:
 spring:
   data.mongodb:
     database: ethdb
-web3j:
-  httpTimeoutSeconds: 0 

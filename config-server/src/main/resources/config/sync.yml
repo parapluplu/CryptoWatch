@@ -1,3 +1,8 @@
-sync.batchSize: 5
+server:
+  port: 8000
+
+sync.batchSize: 50000
 spring.cloud.stream.bindings:
-  output.destination: synced-data
+  output.destination: synced-data 
+web3j:
+  httpTimeoutSeconds: 0 

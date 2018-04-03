@@ -41,7 +41,7 @@ public class SyncServiceManager {
                 throw new SyncServiceException("Address " + address + " cannot be found in the blockchain");
             }
         } catch (IOException e) {
-            throw new SyncServiceException("Error while checking for existing of address " + address, e);
+            throw new SyncServiceException("Error while checking for existence of address " + address, e);
         }
 
         try {

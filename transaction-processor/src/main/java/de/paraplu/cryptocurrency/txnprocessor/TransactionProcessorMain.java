@@ -16,6 +16,8 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 import org.springframework.data.neo4j.repository.config.EnableNeo4jRepositories;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 import de.paraplu.cryptocurrency.domain.EnrichedTransferMessage;
 import de.paraplu.cryptocurrency.domain.TransferMessage;
 import de.paraplu.cryptocurrency.domain.mongodb.pojo.TokenInfo;
@@ -66,14 +68,17 @@ public class TransactionProcessorMain {
         }
     }
 
-    private TriggerEvent infere(EnrichedTransferMessage enriched) {
+    private TriggerEvent infere(EnrichedTransferMessage enriched) throws JsonProcessingException {
         LOGGER.info("TXN amount is " + enriched.getTransferMessage().getAmount());
         BigInteger decimals = enriched.getTokenInfo().getDecimals();
+        BigInteger minToken = BigInteger.valueOf(100);
         if (enriched.getTransferMessage().getAmount().compareTo(
-                BigInteger.TEN.pow(decimals.intValue()).multiply(BigInteger.valueOf(1000000))) >= 0) {
-            TriggerEvent event = new TriggerEvent(
-                    "My custom million trigger",
-                    enriched.getTransferMessage().getTransaction(),
+                BigInteger.TEN.pow(decimals.intValue()).multiply(minToken)) >= 0) {
+            TriggerEvent event;
+            event = new TriggerEvent(
+                    "My custom " + minToken + " trigger",
+                    enriched,
+                    enriched.getTransferMessage().getAmount().toString(),
                     Instant.now());
             return event;
         }
@@ -81,7 +86,7 @@ public class TransactionProcessorMain {
     }
 
     @StreamListener(Sink.INPUT)
-    public void receive(TransferMessage transferMessage) {
+    public void receive(TransferMessage transferMessage) throws JsonProcessingException {
         // all in one service
         store(transferMessage);
         EnrichedTransferMessage enrichedTransferMessage = enrich(transferMessage);
