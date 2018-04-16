@@ -1,0 +1,9 @@
+<h1>Unusual transactions with ERC-20 tokens</h1>
+<h6 *ngIf="tokenInfoes">Tokens monitored: {{tokenInfoes.join(",")}}</h6>
+
+<ul class="te-list">
+	<li *ngFor="let e of triggerEvents">
+  <a routerLink="/trigger-event-details/{{e.id}}">
+      {{e.description}}</a>
+	</li>
+</ul>

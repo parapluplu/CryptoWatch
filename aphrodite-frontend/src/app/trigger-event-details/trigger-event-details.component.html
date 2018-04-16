@@ -1,0 +1,41 @@
+<div *ngIf="data">
+	<h4>TRANSACTION Details</h4>
+<table class="paleBlueRows">
+	<tr>
+		<td>Trigger</td>
+		<td>{{data.triggerId}}</td>
+	</tr>
+	<tr>
+		<td>Description</td>
+		<td>{{data.description}}</td>
+	</tr>
+	<tr>
+		<td>Transaction</td>
+		<td>{{data.data.enrichedTransferMessage.transferMessage.transaction}}</td>
+	</tr>
+	<tr>
+		<td>From</td>
+		<td>{{data.data.enrichedTransferMessage.transferMessage.from}}</td>
+	</tr>
+	<tr>
+		<td>To</td>
+		<td>{{data.data.enrichedTransferMessage.transferMessage.to}}</td>
+	</tr>
+	<tr>
+		<td>Amount</td>
+		<td>{{data.data.enrichedTransferMessage.transferMessage.amount / Math.pow(10, data.data.enrichedTransferMessage.tokenInfo.decimals)}} {{data.data.enrichedTransferMessage.tokenInfo.symbol}}</td>
+	</tr>
+	<tr>
+		<td>Gas Price</td>
+		<td>{{data.data.enrichedTransferMessage.transactionDetails.gasPrice / 1000000000}} GWEI</td>
+	</tr>
+	<tr>
+		<td>Date</td>
+		<td>{{data.data.enrichedTransferMessage.block.timestamp * 1000 | date:'full'}}</td>
+	</tr>
+	<tr>
+		<td>Token</td>
+		<td>{{data.data.enrichedTransferMessage.tokenInfo.symbol}}</td>
+	</tr>
+</table>
+</div>
