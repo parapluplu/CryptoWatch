@@ -222,6 +222,7 @@ public final class Erc20TokenWrapper extends Contract {
             typedResponse._value = (Uint256) eventValues.getNonIndexedValues().get(0);
             typedResponse._block = transactionReceipt.getBlockNumber();
             typedResponse._transactionHash = transactionReceipt.getTransactionHash();
+
             responses.add(typedResponse);
         }
         return responses;

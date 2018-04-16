@@ -1,5 +1,6 @@
 package de.paraplu.cryptocurrency.domain.mongodb.pojo;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 
 import org.springframework.data.annotation.Id;
@@ -11,12 +12,16 @@ import lombok.Setter;
 
 @Data
 @NoArgsConstructor
-public class TokenInfo {
+public class TokenInfo implements Serializable {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
     @Id
     @Setter(AccessLevel.NONE)
-    private String     address;
-    private String     symbol;
-    private BigInteger decimals;
+    private String            address;
+    private String            symbol;
+    private BigInteger        decimals;
 
     public TokenInfo(String address, String symbol, BigInteger decimals) {
         super();

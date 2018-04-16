@@ -1,7 +1,8 @@
 package de.paraplu.cryptocurrency.txnprocessor;
 
-import java.math.BigInteger;
-import java.time.Instant;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -15,18 +16,23 @@ import org.springframework.cloud.stream.messaging.Sink;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.data.neo4j.repository.config.EnableNeo4jRepositories;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.web3j.protocol.Web3j;
+import org.web3j.protocol.core.DefaultBlockParameter;
+import org.web3j.protocol.core.methods.response.EthBlock.Block;
+import org.web3j.protocol.core.methods.response.Transaction;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import de.paraplu.cryptocurrency.domain.EnrichedTransferMessage;
 import de.paraplu.cryptocurrency.domain.TransferMessage;
 import de.paraplu.cryptocurrency.domain.mongodb.pojo.TokenInfo;
-import de.paraplu.cryptocurrency.domain.mongodb.pojo.TriggerEvent;
+import de.paraplu.cryptocurrency.domain.mongodb.pojo.trigger.TriggerEvent;
 import de.paraplu.cryptocurrency.domain.mongodb.repository.SyncStatusInfoRepository;
 import de.paraplu.cryptocurrency.domain.mongodb.repository.TokenInfoRepository;
 import de.paraplu.cryptocurrency.domain.mongodb.repository.TriggerEventRepository;
 import de.paraplu.cryptocurrency.domain.neo4j.pojo.Address;
 import de.paraplu.cryptocurrency.domain.neo4j.repository.AddressRepository;
+import de.paraplu.cryptocurrency.txnprocessor.triggers.TriggerCheck;
 
 @SpringBootApplication
 @EnableNeo4jRepositories(basePackageClasses = AddressRepository.class)
@@ -50,50 +56,60 @@ public class TransactionProcessorMain {
     @Autowired
     private TokenInfoRepository    tokenInfoRepository;
 
-    private void action(TriggerEvent triggerEvent) {
-        triggerEventRepository.save(triggerEvent);
+    @Autowired
+    private List<TriggerCheck>     triggerCheckers;
+
+    @Autowired
+    private Web3j                  web3;
+
+    private void action(List<TriggerEvent> triggerEvents) {
+        triggerEventRepository.saveAll(triggerEvents);
         // TODO
     }
 
-    private EnrichedTransferMessage enrich(TransferMessage transferMessage) {
+    private EnrichedTransferMessage enrich(TransferMessage transferMessage) throws IOException {
         Optional<TokenInfo> tokenInfoOptional = tokenInfoRepository.findById(transferMessage.getTokenAddress());
         if (tokenInfoOptional.isPresent()) {
-            EnrichedTransferMessage enrichedTransferMessage = new EnrichedTransferMessage(
-                    transferMessage,
-                    tokenInfoOptional.get());
-            return enrichedTransferMessage;
+            try {
+                Transaction result = web3.ethGetTransactionByHash(transferMessage.getTransaction()).send().getResult();
+                Block block = web3
+                        .ethGetBlockByNumber(DefaultBlockParameter.valueOf(transferMessage.getBlock()), false)
+                        .send()
+                        .getBlock();
+                EnrichedTransferMessage enrichedTransferMessage = new EnrichedTransferMessage(
+                        transferMessage,
+                        tokenInfoOptional.get(),
+                        result,
+                        block);
+                return enrichedTransferMessage;
+            } catch (IOException e) {
+                LOGGER.error("Error while enriching txn " + transferMessage.getTransaction(), e);
+                throw e;
+            }
         } else {
             LOGGER.error("Cannot process. No token info present for " + transferMessage);
             return null;
         }
     }
 
-    private TriggerEvent infere(EnrichedTransferMessage enriched) throws JsonProcessingException {
-        LOGGER.info("TXN amount is " + enriched.getTransferMessage().getAmount());
-        BigInteger decimals = enriched.getTokenInfo().getDecimals();
-        BigInteger minToken = BigInteger.valueOf(100);
-        if (enriched.getTransferMessage().getAmount().compareTo(
-                BigInteger.TEN.pow(decimals.intValue()).multiply(minToken)) >= 0) {
-            TriggerEvent event;
-            event = new TriggerEvent(
-                    "My custom " + minToken + " trigger",
-                    enriched,
-                    enriched.getTransferMessage().getAmount().toString(),
-                    Instant.now());
-            return event;
+    private List<TriggerEvent> infere(EnrichedTransferMessage enriched) throws JsonProcessingException {
+        List<TriggerEvent> triggerEvents = new ArrayList<>();
+        for (TriggerCheck checker : triggerCheckers) {
+            Optional<TriggerEvent> event = checker.check(enriched);
+            if (event.isPresent()) {
+                triggerEvents.add(event.get());
+            }
         }
-        return null;
+        return triggerEvents;
     }
 
     @StreamListener(Sink.INPUT)
-    public void receive(TransferMessage transferMessage) throws JsonProcessingException {
+    public void receive(TransferMessage transferMessage) throws IOException {
         // all in one service
         store(transferMessage);
         EnrichedTransferMessage enrichedTransferMessage = enrich(transferMessage);
-        TriggerEvent triggerEvent = infere(enrichedTransferMessage);
-        if (triggerEvent != null) {
-            action(triggerEvent);
-        }
+        List<TriggerEvent> triggerEvents = infere(enrichedTransferMessage);
+        action(triggerEvents);
 
     }
 

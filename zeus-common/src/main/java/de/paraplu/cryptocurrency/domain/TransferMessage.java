@@ -1,19 +1,24 @@
 package de.paraplu.cryptocurrency.domain;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 
 import de.paraplu.cryptocurrency.domain.neo4j.pojo.Transfer;
 
-public class TransferMessage {
+public class TransferMessage implements Serializable {
 
-    private String     transaction;
-    private String     from;
-    private String     to;
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+    private String            transaction;
+    private String            from;
+    private String            to;
 
-    private String     tokenAddress;
+    private String            tokenAddress;
 
-    private BigInteger block;
-    private BigInteger amount;
+    private BigInteger        block;
+    private BigInteger        amount;
 
     TransferMessage() {
 
