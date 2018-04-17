@@ -2,6 +2,8 @@ package de.paraplu.cryptocurrency.sync.service;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -15,6 +17,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StopWatch;
 import org.web3j.protocol.Web3j;
+import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.tx.ClientTransactionManager;
 
 import de.paraplu.cryptocurrency.domain.Erc20TokenWrapper;
@@ -49,10 +52,16 @@ public class SyncService {
 
     private void saveTokenInfo(Erc20TokenWrapper erc20TokenWrapper)
             throws InterruptedException, ExecutionException, IOException {
+        Optional<TokenInfo> optionalTokenInfo = tokenInfoRepository.findById(erc20TokenWrapper.getContractAddress());
+        TokenInfo tokenInfo = optionalTokenInfo.orElse(new TokenInfo(erc20TokenWrapper.getContractAddress()));
         String symbol = erc20TokenWrapper.symbol().getValue();
+        if (!symbol.trim().isEmpty()) {
+            tokenInfo.setSymbol(symbol);
+        }
         BigInteger decimals = erc20TokenWrapper.decimals().getValue();
-        String address = erc20TokenWrapper.getContractAddress();
-        TokenInfo tokenInfo = new TokenInfo(address, symbol, decimals);
+        if (decimals != null) {
+            tokenInfo.setDecimals(decimals);
+        }
         tokenInfoRepository.save(tokenInfo);
     }
 
@@ -87,8 +96,8 @@ public class SyncService {
             //
             // for (BigInteger from = first; from.compareTo(last) == -1; from =
             // from.add(batchSize)) {
+
             BigInteger to = first.add(batchSize);
-            System.out.println("SYNC " + first + " - " + to);
             erc20TokenWrapper
                     .transferEventObservable(Web3Util.block(first), Web3Util.block(to))
                     // .takeWhile(new Func1<TransferEventResponse, Boolean>() {
@@ -143,6 +152,7 @@ public class SyncService {
         } catch (InterruptedException e) {
             LOGGER.warn("Syncing process got interrupted for " + syncStatusInfo);
             syncStatusInfo.setStatus(SyncStatus.ABORTED);
+            Thread.currentThread().interrupt();
             // no need to rethrow, since we are in an async method
         } catch (Exception e) {
             syncStatusInfo.setStatus(SyncStatus.ABORTED);
@@ -152,6 +162,75 @@ public class SyncService {
             syncStatusInfoRepository.save(syncStatusInfo);
         }
         LOGGER.debug("Exiting sync method for " + syncStatusInfo);
+    }
+
+    @Async
+    public CompletableFuture<SyncStatusInfo> sync(TokenInfo token) throws SyncServiceException {
+        SyncStatusInfo syncStatusInfoInit = new SyncStatusInfo();
+        syncStatusInfoInit.setContractAdress(token.getAddress());
+        syncStatusInfoInit.setStatus(SyncStatus.SYNCING);
+        final SyncStatusInfo syncStatusInfo = syncStatusInfoRepository.save(syncStatusInfoInit);
+        try {
+            ClientTransactionManager transactionManager = new ClientTransactionManager(web3, token.getAddress());
+            Erc20TokenWrapper erc20TokenWrapper = Erc20TokenWrapper
+                    .load(token.getAddress(), web3, transactionManager, BigInteger.ZERO, BigInteger.ZERO);
+            StopWatch sw = new StopWatch("sync");
+            sw.start();
+            final AtomicBoolean successFlag = new AtomicBoolean(true);
+
+            try {
+                saveTokenInfo(erc20TokenWrapper);
+            } catch (ExecutionException | IOException e) {
+                syncStatusInfo.setStatus(SyncStatus.ABORTED);
+                String msg = "Unable to retrieve token details. Won't start syncing";
+                LOGGER.error(msg, e);
+                throw new SyncServiceException(msg, e);
+            }
+            erc20TokenWrapper
+                    .transferEventObservable(DefaultBlockParameterName.LATEST, DefaultBlockParameterName.LATEST)
+                    .doOnError(exception -> {
+                        successFlag.set(false);
+                        sw.stop();
+                        sw.getLastTaskTimeMillis();
+                        LOGGER.error("Exception while syncing " + syncStatusInfo, exception);
+                        syncStatusInfo.setStatus(SyncStatus.ABORTED);
+                        syncStatusInfoRepository.save(syncStatusInfo);
+                    })
+                    .doOnCompleted(() -> {
+                        System.out.println("DONE REAL");
+                        syncStatusInfo.setCurrentBlock(syncStatusInfo.getTo());
+                        syncStatusInfoRepository.save(syncStatusInfo);
+                    })
+                    .toBlocking()
+                    .subscribe(txn -> {
+                        syncStatusInfo.setCurrentBlock(txn._block);
+                        Address sendFrom = new Address(txn._from.getValue());
+                        Address sendTo = new Address(txn._to.getValue());
+                        Transfer transfer = sendFrom.transfer(
+                                sendTo,
+                                syncStatusInfo.getContractAdress(),
+                                txn._value.getValue(),
+                                txn._transactionHash,
+                                txn._block);
+                        TransferMessage transferMessage = new TransferMessage(transfer);
+                        source.output().send(new GenericMessage<>(transferMessage));
+                        syncStatusInfo.setCurrentBlock(txn._block);
+                        syncStatusInfoRepository.save(syncStatusInfo);
+                    });
+        } catch (InterruptedException e) {
+            LOGGER.warn("Syncing process got interrupted for " + syncStatusInfo);
+            syncStatusInfo.setStatus(SyncStatus.ABORTED);
+            Thread.currentThread().interrupt();
+            // no need to rethrow, since we are in an async method
+        } catch (Exception e) {
+            syncStatusInfo.setStatus(SyncStatus.ABORTED);
+            LOGGER.error("Error while syncing", e);
+            throw e;
+        } finally {
+            syncStatusInfoRepository.save(syncStatusInfo);
+        }
+        LOGGER.debug("Exiting sync method for " + syncStatusInfo);
+        return CompletableFuture.completedFuture(syncStatusInfo);
     }
 
 }

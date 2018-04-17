@@ -8,10 +8,13 @@ import org.springframework.data.annotation.Id;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 @Data
 @NoArgsConstructor
+@RequiredArgsConstructor
 public class TokenInfo implements Serializable {
     /**
      * 
@@ -19,6 +22,7 @@ public class TokenInfo implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @Setter(AccessLevel.NONE)
+    @NonNull
     private String            address;
     private String            symbol;
     private BigInteger        decimals;

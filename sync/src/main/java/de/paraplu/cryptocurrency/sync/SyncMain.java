@@ -13,9 +13,9 @@ import de.paraplu.cryptocurrency.domain.mongodb.repository.SyncStatusInfoReposit
 @EnableMongoRepositories(basePackageClasses = SyncStatusInfoRepository.class)
 @EnableAsync
 @EnableBinding(Source.class)
-public class SyncPastMain {
+public class SyncMain {
 
     public static void main(String[] args) {
-        SpringApplication.run(SyncPastMain.class, args);
+        SpringApplication.run(SyncMain.class, args);
     }
 }
