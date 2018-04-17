@@ -1,15 +1,15 @@
 import { TestBed, inject } from '@angular/core/testing';
 
-import { TriggereventsService } from './triggerevents.service';
+import { TriggerEventsService } from './triggerevents.service';
 
 describe('TriggereventsService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [TriggereventsService]
+      providers: [TriggerEventsService]
     });
   });
 
-  it('should be created', inject([TriggereventsService], (service: TriggereventsService) => {
+  it('should be created', inject([TriggerEventsService], (service: TriggerEventsService) => {
     expect(service).toBeTruthy();
   }));
 });

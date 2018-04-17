@@ -4,6 +4,9 @@ import {HttpClientModule} from '@angular/common/http';
 import {CommonModule} from '@angular/common';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import { DatePipe } from '@angular/common';
+import {AppRoutingModule} from './app-routing.module';
+
+import { CookieModule } from 'ngx-cookie';
 
 
 import {AppComponent} from './app.component';
@@ -13,7 +16,6 @@ import {TokeninfoService} from './shared/tokeninfo/tokeninfo.service';
 import {TriggereventsListComponent} from './triggerevents-list/triggerevents-list.component';
 import {TriggerEventDetailsComponent} from './trigger-event-details/trigger-event-details.component';
 
-import {AppRoutingModule} from './app-routing.module';
 
 @NgModule({
   declarations: [
@@ -26,10 +28,11 @@ import {AppRoutingModule} from './app-routing.module';
     CommonModule,
     HttpClientModule,
     NgbModule.forRoot(),
+    CookieModule.forRoot(),
     AppRoutingModule
   ],
   providers: [TriggerEventsService,
-              TokeninfoService],
+              TokeninfoService ],
   bootstrap: [AppComponent]
 })
 export class AppModule {}

@@ -10,10 +10,13 @@ import {Params, ActivatedRoute} from '@angular/router';
 export class TriggerEventDetailsComponent implements OnInit {
 
   data: any;
+  Math: any;
 
   constructor(
     private route: ActivatedRoute,
-    private triggerEventsService: TriggerEventsService) {}
+    private triggerEventsService: TriggerEventsService) {
+      this.Math = Math;
+    }
 
   ngOnInit() {
     this.getData();

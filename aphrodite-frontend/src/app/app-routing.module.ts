@@ -6,6 +6,7 @@ import {RouterModule, Routes} from '@angular/router';
 const routes: Routes = [
   { path: '', redirectTo: '/triggerevents', pathMatch: 'full' },
   {path: 'triggerevents', component: TriggereventsListComponent},
+  {path: 'triggerevents/:page', component: TriggereventsListComponent},
   {path: 'trigger-event-details/:id', component: TriggerEventDetailsComponent}
 ];
 
