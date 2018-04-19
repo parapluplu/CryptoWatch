@@ -16,7 +16,7 @@ import de.paraplu.cryptocurrency.sync.service.SyncServiceException;
 import de.paraplu.cryptocurrency.sync.service.SyncServiceManager;
 
 @RestController
-public class SyncPastController {
+public class SyncController {
 
     public static class SyncRequest {
         @NotNull

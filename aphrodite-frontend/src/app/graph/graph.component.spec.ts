@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { TriggereventsListComponent } from './triggerevents-list.component';
+import { GraphComponent } from './graph.component';
 
-describe('TriggereventsListComponent', () => {
-  let component: TriggereventsListComponent;
-  let fixture: ComponentFixture<TriggereventsListComponent>;
+describe('GraphComponent', () => {
+  let component: GraphComponent;
+  let fixture: ComponentFixture<GraphComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ TriggereventsListComponent ]
+      declarations: [ GraphComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(TriggereventsListComponent);
+    fixture = TestBed.createComponent(GraphComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

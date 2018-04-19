@@ -10,17 +10,19 @@ import { CookieService } from 'ngx-cookie';
 const SELECTED_TOKENS_COOKIE: string = "SELECTED_TOKENS";
 
 @Component({
-  selector: 'app-triggerevents-list',
-  templateUrl: './triggerevents-list.component.html',
-  styleUrls: ['./triggerevents-list.component.css']
+  selector: 'app-trigger-events-list',
+  templateUrl: './trigger-events-list.component.html',
+  styleUrls: ['./trigger-events-list.component.css']
 })
-export class TriggereventsListComponent implements OnInit {
+export class TriggerEventsListComponent implements OnInit {
   availableTokenInfoes: Array<string>;
   selectedTokenInfoes: {};
   triggerEvents: Array<any>;
-  selectedPage: number;
+  page: number;
   pageSize: number = 20;
   pages: number;
+  collectionSize: number;
+  updating: boolean = false;
   
 
   constructor(private triggerEventsService: TriggerEventsService, 
@@ -29,12 +31,6 @@ export class TriggereventsListComponent implements OnInit {
     private cookieService: CookieService) {}
 
   ngOnInit() {
-    const optionalPageParameter = this.route.snapshot.paramMap.get('page');
-    if(optionalPageParameter) {
-      this.selectedPage = parseInt(optionalPageParameter);
-    } else {
-      this.selectedPage = 0;
-    }
     this.tokeninfoService.getAll().subscribe(data => {
       this.availableTokenInfoes = data._embedded.tokenInfoes.map(e => e.symbol);
       if(this.cookieService.get(SELECTED_TOKENS_COOKIE) == null) {
@@ -51,28 +47,38 @@ export class TriggereventsListComponent implements OnInit {
   }
 
   update() {
+    this.updating = true;
     const tokens = new Array();
     Object.entries(this.selectedTokenInfoes).forEach(([key, checked]) => {
       if(checked === true) {
         tokens.push(key);
       }
     });
-    this.triggerEventsService.getForTokens(tokens, this.selectedPage, this.pageSize).subscribe(data => {
-      this.selectedPage = data.page.number;
+    this.triggerEventsService.getForTokens(tokens, this.page-1, this.pageSize).subscribe(data => {
+      this.page = data.page.number+1;
       this.pages = data.page.totalPages;
+      this.collectionSize=data.page.totalElements;
       this.triggerEvents = data._embedded.triggerEvents;
+      if(this.page > this.pages) {
+        this.page = this.pages-1;
+        this.update();
+      } else {
+        this.updating = false;
+      }
     });
   }
 
   toPage(page: number): void {
-    console.log('change');
-    this.selectedPage = page;
+    this.updating = true;
+    this.page = page+1;
     this.update();
   }
 
   changeToken(token: string, event): void {
+    this.updating = true;
     this.selectedTokenInfoes[token] = event.target.checked;
     this.cookieService.putObject(SELECTED_TOKENS_COOKIE, this.selectedTokenInfoes);
+    this.page = 1;
     this.update();
   }
 

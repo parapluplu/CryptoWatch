@@ -15,4 +15,4 @@ public class AphroditeMain {
     public static void main(String[] args) {
         SpringApplication.run(AphroditeMain.class, args);
     }
-}
+}   

@@ -1,6 +1,8 @@
 import {TriggerEventsService} from '../shared/triggerevents/triggerevents.service';
 import {Component, OnInit, Input} from '@angular/core';
 import {Params, ActivatedRoute} from '@angular/router';
+import { Location } from '@angular/common';
+
 
 @Component({
   selector: 'app-trigger-event-details',
@@ -14,7 +16,8 @@ export class TriggerEventDetailsComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private triggerEventsService: TriggerEventsService) {
+    private triggerEventsService: TriggerEventsService,
+    private location: Location) {
       this.Math = Math;
     }
 
@@ -26,5 +29,9 @@ export class TriggerEventDetailsComponent implements OnInit {
     const id = this.route.snapshot.paramMap.get('id');
     this.triggerEventsService.getById(id)
       .subscribe(data => this.data = data);
+  }
+
+  cancel() {
+    this.location.back();
   }
 }

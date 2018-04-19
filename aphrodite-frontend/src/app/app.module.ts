@@ -1,27 +1,31 @@
-import {BrowserModule} from '@angular/platform-browser';
-import {NgModule} from '@angular/core';
-import {HttpClientModule} from '@angular/common/http';
-import {CommonModule} from '@angular/common';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+import { HttpClientModule } from '@angular/common/http';
+import { CommonModule } from '@angular/common';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { DatePipe } from '@angular/common';
-import {AppRoutingModule} from './app-routing.module';
+import { AppRoutingModule } from './app-routing.module';
 
 import { CookieModule } from 'ngx-cookie';
 
 
-import {AppComponent} from './app.component';
+import { AppComponent } from './app.component';
 
-import {TriggerEventsService} from './shared/triggerevents/triggerevents.service';
-import {TokeninfoService} from './shared/tokeninfo/tokeninfo.service';
-import {TriggereventsListComponent} from './triggerevents-list/triggerevents-list.component';
-import {TriggerEventDetailsComponent} from './trigger-event-details/trigger-event-details.component';
+import { TriggerEventsService } from './shared/triggerevents/triggerevents.service';
+import { TokeninfoService } from './shared/tokeninfo/tokeninfo.service';
+import { TriggerEventsListComponent } from './trigger-events-list/trigger-events-list.component';
+import { TriggerEventDetailsComponent } from './trigger-event-details/trigger-event-details.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
+import { GraphComponent } from './graph/graph.component';
 
 
 @NgModule({
   declarations: [
     AppComponent,
-    TriggereventsListComponent,
-    TriggerEventDetailsComponent
+    TriggerEventsListComponent,
+    TriggerEventDetailsComponent,
+    DashboardComponent,
+    GraphComponent
   ],
   imports: [
     BrowserModule,
@@ -32,7 +36,7 @@ import {TriggerEventDetailsComponent} from './trigger-event-details/trigger-even
     AppRoutingModule
   ],
   providers: [TriggerEventsService,
-              TokeninfoService ],
+    TokeninfoService],
   bootstrap: [AppComponent]
 })
-export class AppModule {}
+export class AppModule { }
