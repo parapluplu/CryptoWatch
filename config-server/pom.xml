@@ -9,7 +9,7 @@
 	<artifactId>config-server</artifactId>
 
 	<properties>
-		<dockerfile.dir>$project.basedir}</dockerfile.dir>
+		<dockerfile.dir>${project.basedir}</dockerfile.dir>
 	</properties>
 
 	<dependencies>
