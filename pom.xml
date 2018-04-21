@@ -113,7 +113,7 @@
 							</image>
 						</images>
 						<authConfig>
-							<username>felix.remmel@googlemail.com</username>
+							<username>gitlab-ci-token</username>
 							<password>WAXmjYvzTMMmNX1dH6Uf</password>
 						</authConfig>
 					</configuration>
