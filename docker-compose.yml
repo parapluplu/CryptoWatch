@@ -5,19 +5,23 @@ services:
   rabbitmq:
     image: rabbitmq:3-alpine
   sync:
-    image: cryptowatch/sync
+    build: sync/
+    image: registry.gitlab.com/cryptocurrencytracker/zeus/sync
     links:
       - rabbitmq
       - mongo
   aphrodite:
-    image: cryptowatch/aphrodite
+    build: aphrodite/
+    image: registry.gitlab.com/cryptocurrencytracker/zeus/aphrodite
     links:
       - mongo
       - config-server
   config-server:
-    image: cryptowatch/config-server
+    build: config-server/
+    image: registry.gitlab.com/cryptocurrencytracker/zeus/config-server  
   transaction-processor:
-    image: cryptowatch/transaction-processor
+    build: transaction-processor/
+    image: registry.gitlab.com/cryptocurrencytracker/zeus/transaction-processor
     links:
       - mongo
       - rabbitmq
