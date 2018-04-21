@@ -81,6 +81,7 @@ validate:jdk8:
 deploy:jdk8:
   stage: deploy
   script:
+    - 'docker logout'
     - 'mvn $MAVEN_CLI_OPTS package'
     - 'mvn $MAVEN_CLI_OPTS docker:build docker:push'
   only:
