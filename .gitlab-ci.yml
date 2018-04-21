@@ -86,6 +86,7 @@ deploy:jdk8:
   script:
     - apk add --update python py-pip python-dev && pip install docker-compose # install docker-compose
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
+    - docker-compose build
     - docker-compose push
   only:
     - master
