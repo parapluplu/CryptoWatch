@@ -1,0 +1,11 @@
+management:
+   endpoint:
+      health:
+        show-details: "ALWAYS"
+
+spring:
+  data:
+    mongodb:
+      database: ethdb
+      host: ${MONGO_HOST:localhost}
+      port: ${MONGO_PORT:27017}

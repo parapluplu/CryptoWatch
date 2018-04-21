@@ -8,6 +8,10 @@
 	</parent>
 	<artifactId>sync</artifactId>
 
+	<properties>
+		<dockerfile.dir>$project.basedir}</dockerfile.dir>
+	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.web3j</groupId>
@@ -38,4 +42,18 @@
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
 	</dependencies>
+
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>com.spotify</groupId>
+				<artifactId>dockerfile-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
 </project>

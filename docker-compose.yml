@@ -1,0 +1,23 @@
+version: '3'
+services:
+  mongo:
+    image: mongo:3
+  rabbitmq:
+    image: rabbitmq:3-alpine
+  sync:
+    image: cryptowatch/sync
+    links:
+      - rabbitmq
+      - mongo
+  aphrodite:
+    image: cryptowatch/aphrodite
+    links:
+      - mongo
+      - config-server
+  config-server:
+    image: cryptowatch/config-server
+  transaction-processor:
+    image: cryptowatch/transaction-processor
+    links:
+      - mongo
+      - rabbitmq

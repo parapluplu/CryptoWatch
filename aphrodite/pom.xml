@@ -8,6 +8,10 @@
 	</parent>
 	<artifactId>aphrodite</artifactId>
 
+	<properties>
+		<dockerfile.dir>$project.basedir}</dockerfile.dir>
+	</properties>
+
 	<dependencies>
 		<dependency>
 			<artifactId>zeus-common</artifactId>
@@ -30,4 +34,17 @@
 			<artifactId>spring-boot-starter-aop</artifactId>
 		</dependency>
 	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>com.spotify</groupId>
+				<artifactId>dockerfile-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
 </project>

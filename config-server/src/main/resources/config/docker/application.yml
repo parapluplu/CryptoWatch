@@ -4,5 +4,6 @@ management:
         show-details: "ALWAYS"
 
 spring:
-  data.mongodb:
-    database: ethdb
+  data:
+    mongodb:
+      host: mongo

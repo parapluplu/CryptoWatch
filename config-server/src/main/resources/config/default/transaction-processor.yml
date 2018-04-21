@@ -1,0 +1,6 @@
+sync.batchSize: 5
+spring:
+  cloud.stream.bindings:
+    input.destination: synced-data
+  rabbitmq:
+    addresses: ${RABBITMQ_ADDRESSES:}
