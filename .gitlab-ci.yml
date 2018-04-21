@@ -28,6 +28,12 @@ variables:
 cache:
   paths:
     - .m2/repository
+    
+services:
+  - docker:dind
+variables:
+  DOCKER_HOST: tcp://docker:2375
+  DOCKER_DRIVER: overlay2
 
 # This will only validate and compile stuff and run e.g. maven-enforcer-plugin.
 # Because some enforcer rules might check dependency convergence and class duplications
