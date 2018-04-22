@@ -1,0 +1,37 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: C:\tools\kompose\kompose.exe convert -f .\docker-compose-kubernetes.yml
+    kompose.version: 1.12.0 (0ab07be)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: parity
+  name: parity
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: parity
+    spec:
+      hostname: parity
+      containers:
+      - args:
+        - --base-path
+        - /var/lib/parity/data
+        image: parity/parity:stable
+        name: parity
+        resources: {}
+        volumeMounts:
+        - mountPath: /var/lib/parity/data
+          name: parity-data
+      restartPolicy: Always
+      volumes:
+      - name: parity-data
+        persistentVolumeClaim:
+          claimName: parity-data
+status: {}
