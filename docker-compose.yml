@@ -4,24 +4,44 @@ services:
     image: mongo:3
   rabbitmq:
     image: rabbitmq:3-alpine
+  parity:
+    image: parity/parity:stable
+    command: --base-path /var/lib/parity/data
+    volumes:
+      - parity-data:/var/lib/parity/data
   sync:
-    build: sync/
+    build:
+      context: sync/
+      args:
+        JAR_FILE: target/sync-0.0.1-SNAPSHOT.jar
     image: registry.gitlab.com/cryptocurrencytracker/zeus/sync
     links:
       - rabbitmq
       - mongo
+      - parity
   aphrodite:
-    build: aphrodite/
+    build: 
+      context: aphrodite/
+      args:
+        JAR_FILE: target/aphrodite-0.0.1-SNAPSHOT.jar
     image: registry.gitlab.com/cryptocurrencytracker/zeus/aphrodite
     links:
       - mongo
       - config-server
   config-server:
-    build: config-server/
+    build: 
+      context: config-server/
+      args:
+        JAR_FILE: target/aphrodite-0.0.1-SNAPSHOT.jar
     image: registry.gitlab.com/cryptocurrencytracker/zeus/config-server  
   transaction-processor:
-    build: transaction-processor/
+    build: 
+      context: transaction-processor/
+      args:
+        JAR_FILE: target/aphrodite-0.0.1-SNAPSHOT.jar
     image: registry.gitlab.com/cryptocurrencytracker/zeus/transaction-processor
     links:
       - mongo
       - rabbitmq
+volumes:
+  parity-data:
