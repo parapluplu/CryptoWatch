@@ -19,7 +19,7 @@ public class GasPriceTriggerCheckTest {
     public void testCheckLess() {
         GasPriceTriggerCheck tc = new GasPriceTriggerCheck();
         Transaction transactionDetails = new Transaction();
-        transactionDetails.setGasPrice(Numeric.encodeQuantity(BigInteger.valueOf(59999999999l)));
+        transactionDetails.setGasPrice(Numeric.encodeQuantity(BigInteger.valueOf(1l)));
         EnrichedTransferMessage message = new EnrichedTransferMessage(null, null, transactionDetails, null);
         Optional<TriggerEvent> check = tc.check(message);
         assertFalse(check.isPresent());
