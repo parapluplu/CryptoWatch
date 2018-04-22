@@ -32,13 +32,13 @@ services:
     build: 
       context: config-server/
       args:
-        JAR_FILE: target/aphrodite-0.0.1-SNAPSHOT.jar
+        JAR_FILE: target/config-server-0.0.1-SNAPSHOT.jar
     image: registry.gitlab.com/cryptocurrencytracker/zeus/config-server  
   transaction-processor:
     build: 
       context: transaction-processor/
       args:
-        JAR_FILE: target/aphrodite-0.0.1-SNAPSHOT.jar
+        JAR_FILE: target/transaction-processor-0.0.1-SNAPSHOT.jar
     image: registry.gitlab.com/cryptocurrencytracker/zeus/transaction-processor
     links:
       - mongo
