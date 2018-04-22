@@ -14,6 +14,7 @@
 		<module>aphrodite</module>
 		<module>zeus-common</module>
 		<module>sync</module>
+		<module>transaction-processor</module>
 		<module>config-server</module>
 	</modules>
 
