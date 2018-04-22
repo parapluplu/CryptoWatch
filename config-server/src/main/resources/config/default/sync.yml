@@ -5,4 +5,5 @@ sync.batchSize: 50000
 spring.cloud.stream.bindings:
   output.destination: synced-data 
 web3j:
+  client-address: http://parity:8545
   httpTimeoutSeconds: 0 

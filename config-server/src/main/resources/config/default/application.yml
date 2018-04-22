@@ -4,8 +4,9 @@ management:
         show-details: "ALWAYS"
 
 spring:
+  rabbitmq:
+    host: rabbitmq
   data:
     mongodb:
       database: ethdb
-      host: ${MONGO_HOST:localhost}
-      port: ${MONGO_PORT:27017}
+      uri: mongodb://mongo-0.mongo:27017,mongodb://mongo-1.mongo:27017
