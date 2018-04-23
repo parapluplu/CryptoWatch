@@ -1,6 +1,0 @@
-server:
-  port: 8001
-spring.data.rest.basePath: /api
-
-spring.jackson.serialization.write-dates-as-timestamps: false
-spring.jackson.date-format: yyyy-MM-dd HH:mm:ss

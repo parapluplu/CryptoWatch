@@ -4,6 +4,9 @@ management:
         show-details: "ALWAYS"
 
 spring:
+  rabbitmq:
+    host: rabbitmq
   data:
     mongodb:
-      host: mongo
+      database: ethdb
+      uri: mongodb://mongodb:27017
