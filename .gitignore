@@ -24,3 +24,4 @@ yarn-error.log
 .sts4-cache/
 .vscode/
 dist/
+*.core-workspace
