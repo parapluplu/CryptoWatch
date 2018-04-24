@@ -28,6 +28,12 @@ services:
     links:
       - mongo
       - config-server
+  aphrodite-frontend:
+    build:
+      context: aphrodite-frontend/
+    image: registry.gitlab.com/cryptocurrencytracker/zeus/aphrodite-frontend
+    links:
+      - aphrodite
   config-server:
     build: 
       context: config-server/
