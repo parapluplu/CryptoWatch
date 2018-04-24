@@ -80,6 +80,7 @@ build angular:5:
   stage: build
   image: node:latest
   before_script:
+    - cd aphrodite-frontend
     - npm install
   script:
     - ng build --prod --build-optimizer
