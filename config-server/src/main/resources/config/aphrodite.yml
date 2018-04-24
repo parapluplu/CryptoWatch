@@ -1,5 +1,3 @@
-server:
-  port: 8001
 spring.data.rest.basePath: /api
 
 spring.jackson.serialization.write-dates-as-timestamps: false
