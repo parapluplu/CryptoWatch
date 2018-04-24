@@ -1,12 +1,8 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: C:\tools\kompose\kompose.exe convert -f .\docker-compose-kubernetes.yml
-    kompose.version: 1.12.0 (0ab07be)
-  creationTimestamp: null
   labels:
-    io.kompose.service: aphrodite
+    service: aphrodite
   name: aphrodite
 spec:
   replicas: 1
@@ -15,7 +11,7 @@ spec:
     metadata:
       creationTimestamp: null
       labels:
-        io.kompose.service: aphrodite
+        service: aphrodite
     spec:
       containers:
       - image: registry.gitlab.com/cryptocurrencytracker/zeus/aphrodite

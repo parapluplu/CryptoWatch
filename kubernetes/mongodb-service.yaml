@@ -1,0 +1,11 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: mongodb
+spec:
+  selector:
+    service: mongodb
+  ports:
+  - protocol: TCP
+    port: 27017
+    targetPort: 27017

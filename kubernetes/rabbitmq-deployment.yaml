@@ -1,26 +1,23 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: C:\tools\kompose\kompose.exe convert -f .\docker-compose-kubernetes.yml
-    kompose.version: 1.12.0 (0ab07be)
-  creationTimestamp: null
   labels:
-    io.kompose.service: rabbitmq
+    service: rabbitmq
   name: rabbitmq
 spec:
   replicas: 1
   strategy: {}
   template:
     metadata:
-      creationTimestamp: null
       labels:
-        io.kompose.service: rabbitmq
+        service: rabbitmq
     spec:
-      host: rabbitmq
+      hostname: rabbitmq
       containers:
       - image: rabbitmq:3-alpine
         name: rabbitmq
         resources: {}
+        ports:
+        - containerPort: 5673
       restartPolicy: Always
 status: {}

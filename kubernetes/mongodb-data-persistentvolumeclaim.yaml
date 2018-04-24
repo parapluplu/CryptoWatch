@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: parity-data
+  name: mongodb-data
 spec:
   accessModes:
   - ReadWriteOnce

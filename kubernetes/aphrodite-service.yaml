@@ -1,0 +1,11 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: aphrodite
+spec:
+  selector:
+    service: aphrodite
+  ports:
+  - protocol: TCP
+    port: 8080
+    targetPort: 8080
