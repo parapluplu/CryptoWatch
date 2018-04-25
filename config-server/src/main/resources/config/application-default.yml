@@ -5,7 +5,7 @@ management:
 
 spring:
   rabbitmq:
-    host: rabbitmq
+    host: localhost
   data:
     mongodb:
       database: ethdb
