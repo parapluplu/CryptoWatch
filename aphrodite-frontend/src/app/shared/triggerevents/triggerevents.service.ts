@@ -7,7 +7,7 @@ import { environment } from '../../../environments/environment.prod';
 export class TriggerEventsService {
 
   getForTokens(tokens: Array<string>, page: number, pageSize: number): any {
-    return this.http.get(environment.apiUrl + 'triggerEvents/search/findByTokens', {
+    return this.http.get(environment.apiUrl + '/api/triggerEvents/search/findByTokensSlim', {
       params: {
         tokenSymbols: tokens.join(','),
         page: page.toString(),
@@ -19,10 +19,10 @@ export class TriggerEventsService {
   constructor(private http: HttpClient) {}
 
   getAll(): Observable<any> {
-    return this.http.get(environment.apiUrl + '/triggerEvents/all?sort=date,desc');
+    return this.http.get(environment.apiUrl + '/api/triggerEvents/all?sort=date,desc');
   }
 
   getById(id: string): Observable<any> {
-    return this.http.get(environment.apiUrl + '/triggerEvents/' + id);
+    return this.http.get(environment.apiUrl + '/api/triggerEvents/' + id);
   }
 }

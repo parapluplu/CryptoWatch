@@ -9,10 +9,10 @@ export class TokeninfoService {
   constructor(private http: HttpClient) {}
 
   getAll(): Observable<any> {
-    return this.http.get(environment.apiUrl + '/tokenInfoes');
+    return this.http.get(environment.apiUrl + '/api/tokenInfoes');
   }
 
   getById(id: string): Observable<any> {
-    return this.http.get(environment.apiUrl +  + '/tokenInfoes/' + id);
+    return this.http.get(environment.apiUrl + '/api/tokenInfoes/' + id);
   }
 }
