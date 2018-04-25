@@ -106,10 +106,12 @@ public class TransactionProcessorMain {
     @StreamListener(Sink.INPUT)
     public void receive(TransferMessage transferMessage) throws IOException {
         // all in one service
+        LOGGER.info("Processing message " + transferMessage.getTransaction());
         store(transferMessage);
         EnrichedTransferMessage enrichedTransferMessage = enrich(transferMessage);
         List<TriggerEvent> triggerEvents = infere(enrichedTransferMessage);
         action(triggerEvents);
+        LOGGER.info("[DONE] " + transferMessage.getTransaction());
 
     }
 
