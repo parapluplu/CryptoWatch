@@ -1,12 +1,12 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: aphrodite
+  name: frontend
 spec:
   type: LoadBalancer
   selector:
-    service: aphrodite
+    service: frontend
   ports:
   - protocol: TCP
-    port: 8080
-    targetPort: 8080
+    port: 80
+    targetPort: 80

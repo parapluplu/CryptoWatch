@@ -1,0 +1,33 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: frontend
+  labels:
+    service: frontend
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        service: frontend
+    spec:
+      containers:
+      - image: registry.gitlab.com/cryptocurrencytracker/zeus/aphrodite-frontend
+        name: frontend
+        resources: {}
+        volumeMounts:
+          - name: frontent-nginx-configmap
+            mountPath: /etc/nginx/nginx.conf
+            subPath: nginx.conf
+        ports:
+        - containerPort: 80
+      imagePullSecrets:
+      - name: regcred
+      restartPolicy: Always
+      volumes:
+        - name: frontent-nginx-configmap
+          configMap:
+            name: frontent-nginx-configmap
+status: {}

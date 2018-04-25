@@ -15,11 +15,10 @@ spec:
     spec:
       containers:
       - args:
-        - --no-warp
         - --base-path=/var/lib/parity/data
         - --db-compaction=ssd
         - --mode=active
-        - --cache-size=7168
+        - --cache-size=2048
         - --unsafe-expose
         image: parity/parity:stable
         name: parity
@@ -31,8 +30,7 @@ spec:
         - containerPort: 8545
         resources:
           requests:
-            cpu: "1.2"
-            memory: "9Gi"
+            memory: "4Gi"
       restartPolicy: Always
       volumes:
       - name: parity-data

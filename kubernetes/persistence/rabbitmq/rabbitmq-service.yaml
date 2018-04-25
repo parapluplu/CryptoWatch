@@ -7,5 +7,5 @@ spec:
     service: rabbitmq
   ports:
   - protocol: TCP
-    port: 5673
-    targetPort: 5673
+    port: 5672
+    targetPort: 5672

@@ -5,8 +5,8 @@ metadata:
 spec:
   accessModes:
   - ReadWriteOnce
-  storageClassName: ssd
+  storageClassName: fast
   resources:
     requests:
-      storage: 100Gi
+      storage: 40Gi
 status: {}
