@@ -19,10 +19,10 @@ export class TriggerEventsService {
   constructor(private http: HttpClient) {}
 
   getAll(): Observable<any> {
-    return this.http.get(environment.apiUrl + 'triggerEvents/all?sort=date,desc');
+    return this.http.get(environment.apiUrl + '/triggerEvents/all?sort=date,desc');
   }
 
   getById(id: string): Observable<any> {
-    return this.http.get(environment.apiUrl + 'api/triggerEvents/' + id);
+    return this.http.get(environment.apiUrl + '/triggerEvents/' + id);
   }
 }
