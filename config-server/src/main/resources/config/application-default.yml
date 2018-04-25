@@ -10,3 +10,9 @@ spring:
     mongodb:
       database: ethdb
       uri: mongodb://localhost:27017
+
+      
+web3j:
+  client-address: http://localhost:8545
+  httpTimeoutSeconds: 0 
+      
