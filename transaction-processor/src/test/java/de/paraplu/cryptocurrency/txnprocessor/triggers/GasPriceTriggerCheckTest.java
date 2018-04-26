@@ -18,6 +18,7 @@ public class GasPriceTriggerCheckTest {
     @Test
     public void testCheckLess() {
         GasPriceTriggerCheck tc = new GasPriceTriggerCheck();
+        tc.setMinValue(BigInteger.valueOf(2));
         Transaction transactionDetails = new Transaction();
         transactionDetails.setGasPrice(Numeric.encodeQuantity(BigInteger.valueOf(1l)));
         EnrichedTransferMessage message = new EnrichedTransferMessage(null, null, transactionDetails, null);
@@ -28,6 +29,7 @@ public class GasPriceTriggerCheckTest {
     @Test
     public void testCheckMore() {
         GasPriceTriggerCheck tc = new GasPriceTriggerCheck();
+        tc.setMinValue(BigInteger.valueOf(60000000000l));
         Transaction transactionDetails = new Transaction();
         transactionDetails.setGasPrice(Numeric.encodeQuantity(BigInteger.valueOf(60000000001l)));
         EnrichedTransferMessage message = new EnrichedTransferMessage(null, null, transactionDetails, null);

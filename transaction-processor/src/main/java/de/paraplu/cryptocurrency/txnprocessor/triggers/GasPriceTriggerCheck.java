@@ -8,8 +8,10 @@ import org.springframework.stereotype.Service;
 import de.paraplu.cryptocurrency.domain.EnrichedTransferMessage;
 import de.paraplu.cryptocurrency.domain.mongodb.pojo.trigger.TriggerEvent;
 import de.paraplu.cryptocurrency.util.CryptoConverter.EthConverter;
+import lombok.Data;
 
 @Service
+@Data
 public class GasPriceTriggerCheck implements TriggerCheck {
 
     private BigInteger minValue = BigInteger.valueOf(90000000000l);
