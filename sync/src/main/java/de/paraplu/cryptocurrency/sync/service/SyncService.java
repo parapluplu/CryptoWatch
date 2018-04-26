@@ -2,6 +2,7 @@ package de.paraplu.cryptocurrency.sync.service;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -16,11 +17,19 @@ import org.springframework.messaging.support.GenericMessage;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StopWatch;
+import org.web3j.abi.EventValues;
+import org.web3j.abi.TypeReference;
+import org.web3j.abi.datatypes.Event;
+import org.web3j.abi.datatypes.generated.Uint256;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
+import org.web3j.protocol.core.methods.request.EthFilter;
+import org.web3j.protocol.core.methods.response.Log;
 import org.web3j.tx.ClientTransactionManager;
+import org.web3j.tx.Contract;
 
 import de.paraplu.cryptocurrency.domain.Erc20TokenWrapper;
+import de.paraplu.cryptocurrency.domain.Erc20TokenWrapper.TransferEventResponse;
 import de.paraplu.cryptocurrency.domain.TransferMessage;
 import de.paraplu.cryptocurrency.domain.mongodb.pojo.SyncStatusInfo;
 import de.paraplu.cryptocurrency.domain.mongodb.pojo.TokenInfo;
@@ -34,7 +43,16 @@ import de.paraplu.cryptocurrency.sync.util.Web3Util;
 @Component
 public class SyncService {
 
-    private static final Logger      LOGGER = LoggerFactory.getLogger(SyncService.class);
+    private static final Event       TRANSFER_EVENT = new Event(
+            "Transfer",
+            Arrays.<TypeReference<?>>asList(new TypeReference<org.web3j.abi.datatypes.Address>() {
+                                                            },
+                    new TypeReference<org.web3j.abi.datatypes.Address>() {
+                    }),
+            Arrays.<TypeReference<?>>asList(new TypeReference<Uint256>() {
+            }));
+
+    private static final Logger      LOGGER         = LoggerFactory.getLogger(SyncService.class);
 
     @Autowired
     private SyncStatusInfoRepository syncStatusInfoRepository;
@@ -186,37 +204,71 @@ public class SyncService {
                 LOGGER.error(msg, e);
                 throw new SyncServiceException(msg, e);
             }
-            erc20TokenWrapper
-                    .transferEventObservable(DefaultBlockParameterName.LATEST, DefaultBlockParameterName.LATEST)
-                    .doOnError(exception -> {
-                        successFlag.set(false);
-                        sw.stop();
-                        sw.getLastTaskTimeMillis();
-                        LOGGER.error("Exception while syncing " + syncStatusInfo, exception);
-                        syncStatusInfo.setStatus(SyncStatus.ABORTED);
-                        syncStatusInfoRepository.save(syncStatusInfo);
-                    })
-                    .doOnCompleted(() -> {
-                        System.out.println("DONE REAL");
-                        syncStatusInfo.setCurrentBlock(syncStatusInfo.getTo());
-                        syncStatusInfoRepository.save(syncStatusInfo);
-                    })
-                    .toBlocking()
-                    .subscribe(txn -> {
-                        syncStatusInfo.setCurrentBlock(txn._block);
-                        Address sendFrom = new Address(txn._from.getValue());
-                        Address sendTo = new Address(txn._to.getValue());
-                        Transfer transfer = sendFrom.transfer(
-                                sendTo,
-                                syncStatusInfo.getContractAdress(),
-                                txn._value.getValue(),
-                                txn._transactionHash,
-                                txn._block);
-                        TransferMessage transferMessage = new TransferMessage(transfer);
-                        source.output().send(new GenericMessage<>(transferMessage));
-                        syncStatusInfo.setCurrentBlock(txn._block);
-                        syncStatusInfoRepository.save(syncStatusInfo);
-                    });
+            EthFilter filter = new EthFilter(
+                    DefaultBlockParameterName.LATEST,
+                    DefaultBlockParameterName.LATEST,
+                    token.getAddress());
+            filter.addSingleTopic(TRANSFER_EVENT.getName());
+            web3.ethLogObservable(filter).doOnError(exception -> {
+                successFlag.set(false);
+                sw.stop();
+                sw.getLastTaskTimeMillis();
+                LOGGER.error("Exception while syncing " + syncStatusInfo, exception);
+                syncStatusInfo.setStatus(SyncStatus.ABORTED);
+                syncStatusInfoRepository.save(syncStatusInfo);
+            }).doOnCompleted(() -> {
+                System.out.println("DONE REAL");
+                syncStatusInfo.setCurrentBlock(syncStatusInfo.getTo());
+                syncStatusInfoRepository.save(syncStatusInfo);
+            }).toBlocking().subscribe(log -> {
+                syncStatusInfo.setCurrentBlock(log.getBlockNumber());
+                TransferEventResponse txn = extractTransfer(log);
+                Address sendFrom = new Address(txn._from.getValue());
+                Address sendTo = new Address(txn._to.getValue());
+                Transfer transfer = sendFrom.transfer(
+                        sendTo,
+                        syncStatusInfo.getContractAdress(),
+                        txn._value.getValue(),
+                        txn._transactionHash,
+                        txn._block);
+                TransferMessage transferMessage = new TransferMessage(transfer);
+                source.output().send(new GenericMessage<>(transferMessage));
+                syncStatusInfo.setCurrentBlock(txn._block);
+                syncStatusInfoRepository.save(syncStatusInfo);
+            });
+
+            // erc20TokenWrapper
+            // .transferEventObservable(DefaultBlockParameterName.LATEST,
+            // DefaultBlockParameterName.LATEST)
+            // .doOnError(exception -> {
+            // successFlag.set(false);
+            // sw.stop();
+            // sw.getLastTaskTimeMillis();
+            // LOGGER.error("Exception while syncing " + syncStatusInfo, exception);
+            // syncStatusInfo.setStatus(SyncStatus.ABORTED);
+            // syncStatusInfoRepository.save(syncStatusInfo);
+            // })
+            // .doOnCompleted(() -> {
+            // System.out.println("DONE REAL");
+            // syncStatusInfo.setCurrentBlock(syncStatusInfo.getTo());
+            // syncStatusInfoRepository.save(syncStatusInfo);
+            // })
+            // .toBlocking()
+            // .subscribe(txn -> {
+            // syncStatusInfo.setCurrentBlock(txn._block);
+            // Address sendFrom = new Address(txn._from.getValue());
+            // Address sendTo = new Address(txn._to.getValue());
+            // Transfer transfer = sendFrom.transfer(
+            // sendTo,
+            // syncStatusInfo.getContractAdress(),
+            // txn._value.getValue(),
+            // txn._transactionHash,
+            // txn._block);
+            // TransferMessage transferMessage = new TransferMessage(transfer);
+            // source.output().send(new GenericMessage<>(transferMessage));
+            // syncStatusInfo.setCurrentBlock(txn._block);
+            // syncStatusInfoRepository.save(syncStatusInfo);
+            // });
         } catch (InterruptedException e) {
             LOGGER.warn("Syncing process got interrupted for " + syncStatusInfo);
             syncStatusInfo.setStatus(SyncStatus.ABORTED);
@@ -231,6 +283,17 @@ public class SyncService {
         }
         LOGGER.debug("Exiting sync method for " + syncStatusInfo);
         return CompletableFuture.completedFuture(syncStatusInfo);
+    }
+
+    private TransferEventResponse extractTransfer(Log log) {
+        EventValues eventValues = Contract.staticExtractEventParameters(TRANSFER_EVENT, log);
+        TransferEventResponse txn = new TransferEventResponse();
+        txn._from = (org.web3j.abi.datatypes.Address) eventValues.getIndexedValues().get(0);
+        txn._to = (org.web3j.abi.datatypes.Address) eventValues.getIndexedValues().get(1);
+        txn._value = (Uint256) eventValues.getNonIndexedValues().get(0);
+        txn._block = log.getBlockNumber();
+        txn._transactionHash = log.getTransactionHash();
+        return txn;
     }
 
 }
