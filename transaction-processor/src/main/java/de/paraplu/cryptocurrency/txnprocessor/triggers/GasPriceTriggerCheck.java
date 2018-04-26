@@ -12,7 +12,7 @@ import de.paraplu.cryptocurrency.util.CryptoConverter.EthConverter;
 @Service
 public class GasPriceTriggerCheck implements TriggerCheck {
 
-    private BigInteger minValue = BigInteger.valueOf(45000000000l);
+    private BigInteger minValue = BigInteger.valueOf(90000000000l);
 
     @Override
     public Optional<TriggerEvent> check(EnrichedTransferMessage message) {

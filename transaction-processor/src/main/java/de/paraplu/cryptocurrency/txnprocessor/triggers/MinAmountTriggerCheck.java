@@ -18,11 +18,12 @@ public class MinAmountTriggerCheck extends TriggerCheckPerToken {
     @Override
     public Optional<TriggerEvent> check(EnrichedTransferMessage message, Map<String, String> config) {
         BigInteger minAmount = new BigInteger(config.get(MIN_AMOUNT_CONFIG));
-        if (message.getTransferMessage().getAmount().compareTo(minAmount) >= 0) {
+        BigInteger amount = message.getTransferMessage().getAmount();
+        if (amount.compareTo(minAmount) >= 0) {
             final TriggerEvent event = TriggerEvent.txnBasedTriggerEvent(
                     "Minimum amount trigger",
-                    "txn amount >= " + CryptoConverter.normalize(minAmount, message.getTokenInfo().getDecimals()) + " "
-                            + message.getTokenInfo().getSymbol(),
+                    "transfered " + CryptoConverter.normalize(amount, message.getTokenInfo().getDecimals()).intValue()
+                            + " " + message.getTokenInfo().getSymbol(),
                     message);
             return Optional.of(event);
         }
