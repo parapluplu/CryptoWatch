@@ -1,4 +1,5 @@
-import {Component, ViewChild, OnInit} from '@angular/core';
+import { Component, ViewChild, OnInit } from '@angular/core';
+import { Router, NavigationEnd } from '@angular/router';
 
 
 @Component({
@@ -8,6 +9,14 @@ import {Component, ViewChild, OnInit} from '@angular/core';
 })
 export class AppComponent implements OnInit {
 
+  constructor(private router: Router) {
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationEnd) {
+        (<any>window).ga('set', 'page', event.urlAfterRedirects);
+        (<any>window).ga('send', 'pageview');
+      }
+    });
+  }
 
   ngOnInit(): void {
   }
