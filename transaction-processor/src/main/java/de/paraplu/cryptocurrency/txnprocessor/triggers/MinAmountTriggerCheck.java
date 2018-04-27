@@ -1,12 +1,13 @@
 package de.paraplu.cryptocurrency.txnprocessor.triggers;
 
 import java.math.BigInteger;
+import java.text.NumberFormat;
 import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
-import de.paraplu.cryptocurrency.domain.EnrichedTransferMessage;
+import de.paraplu.cryptocurrency.domain.mongodb.pojo.EnrichedTransferMessage;
 import de.paraplu.cryptocurrency.domain.mongodb.pojo.trigger.TriggerEvent;
 import de.paraplu.cryptocurrency.util.CryptoConverter;
 
@@ -20,10 +21,11 @@ public class MinAmountTriggerCheck extends TriggerCheckPerToken {
         BigInteger minAmount = new BigInteger(config.get(MIN_AMOUNT_CONFIG));
         BigInteger amount = message.getTransferMessage().getAmount();
         if (amount.compareTo(minAmount) >= 0) {
+            String niceAmount = NumberFormat.getInstance().format(
+                    CryptoConverter.normalize(amount, message.getTokenInfo().getDecimals()).doubleValue());
             final TriggerEvent event = TriggerEvent.txnBasedTriggerEvent(
                     "Minimum amount trigger",
-                    "transfered " + CryptoConverter.normalize(amount, message.getTokenInfo().getDecimals()).intValue()
-                            + " " + message.getTokenInfo().getSymbol(),
+                    "transfered " + niceAmount + " " + message.getTokenInfo().getSymbol(),
                     message);
             return Optional.of(event);
         }

@@ -6,7 +6,7 @@ import java.util.Map;
 
 import org.springframework.data.annotation.Id;
 
-import de.paraplu.cryptocurrency.domain.EnrichedTransferMessage;
+import de.paraplu.cryptocurrency.domain.mongodb.pojo.EnrichedTransferMessage;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Setter;
@@ -14,12 +14,14 @@ import lombok.Setter;
 @Data
 public class TriggerEvent {
 
-    private static final String ENRICHED_TRANSFER_MESSAGE = "enrichedTransferMessage";
+    private static final String TXN_HASH = "txnHash";
+    private static final String SYMBOL   = "symbol";
 
     public static TriggerEvent txnBasedTriggerEvent(String triggerId, String description,
             EnrichedTransferMessage enrichedTransferMessage) {
         Map<String, Object> data = new HashMap<>();
-        data.put(ENRICHED_TRANSFER_MESSAGE, enrichedTransferMessage);
+        data.put(TXN_HASH, enrichedTransferMessage.getTxnHash());
+        data.put(SYMBOL, enrichedTransferMessage.getTokenInfo().getSymbol());
         return new TriggerEvent(triggerId, description, Instant.now(), "txnBasedTriggerEvent", data);
     }
 

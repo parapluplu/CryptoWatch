@@ -10,7 +10,7 @@ import org.junit.Test;
 import org.web3j.protocol.core.methods.response.Transaction;
 import org.web3j.utils.Numeric;
 
-import de.paraplu.cryptocurrency.domain.EnrichedTransferMessage;
+import de.paraplu.cryptocurrency.domain.mongodb.pojo.EnrichedTransferMessage;
 import de.paraplu.cryptocurrency.domain.mongodb.pojo.trigger.TriggerEvent;
 
 public class GasPriceTriggerCheckTest {
@@ -21,7 +21,7 @@ public class GasPriceTriggerCheckTest {
         tc.setMinValue(BigInteger.valueOf(2));
         Transaction transactionDetails = new Transaction();
         transactionDetails.setGasPrice(Numeric.encodeQuantity(BigInteger.valueOf(1l)));
-        EnrichedTransferMessage message = new EnrichedTransferMessage(null, null, transactionDetails, null);
+        EnrichedTransferMessage message = new EnrichedTransferMessage("", null, null, transactionDetails, null);
         Optional<TriggerEvent> check = tc.check(message);
         assertFalse(check.isPresent());
     }
@@ -32,7 +32,7 @@ public class GasPriceTriggerCheckTest {
         tc.setMinValue(BigInteger.valueOf(60000000000l));
         Transaction transactionDetails = new Transaction();
         transactionDetails.setGasPrice(Numeric.encodeQuantity(BigInteger.valueOf(60000000001l)));
-        EnrichedTransferMessage message = new EnrichedTransferMessage(null, null, transactionDetails, null);
+        EnrichedTransferMessage message = new EnrichedTransferMessage("", null, null, transactionDetails, null);
         Optional<TriggerEvent> check = tc.check(message);
         assertTrue(check.isPresent());
     }

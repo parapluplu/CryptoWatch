@@ -6,13 +6,8 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import de.paraplu.cryptocurrency.domain.mongodb.pojo.SyncStatusInfo;
-import de.paraplu.cryptocurrency.sync.service.SyncServiceException;
 import de.paraplu.cryptocurrency.sync.service.SyncServiceManager;
 
 @RestController
@@ -44,9 +39,4 @@ public class SyncController {
 
     @Autowired
     private SyncServiceManager syncServiceManager;
-
-    @RequestMapping(value = "/sync", method = RequestMethod.POST)
-    public SyncStatusInfo sync(@RequestBody SyncRequest syncRequest) throws SyncServiceException {
-        return syncServiceManager.sync(syncRequest.getFrom(), syncRequest.getAddress());
-    }
 }

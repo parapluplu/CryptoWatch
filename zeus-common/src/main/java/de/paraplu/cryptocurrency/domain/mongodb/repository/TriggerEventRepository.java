@@ -14,9 +14,6 @@ import de.paraplu.cryptocurrency.domain.mongodb.pojo.trigger.TriggerEvent;
 @Repository
 public interface TriggerEventRepository extends MongoRepository<TriggerEvent, String> {
 
-    @Query(
-            value = "{'data.enrichedTransferMessage.tokenInfo.symbol': { '$in': ?0 } }",
-            fields = "{'id': 1, 'date.content': 1, 'date': 1, 'description': 1}")
-    public Page<TriggerEvent> findByTokensSlim(@Param("tokenSymbols") Collection<String> tokenSymbol,
-            Pageable pageable);
+    @Query(value = "{'data.symbol': { '$in': ?0 } }")
+    public Page<TriggerEvent> findByTokens(@Param("tokenSymbols") Collection<String> tokenSymbol, Pageable pageable);
 }

@@ -5,7 +5,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
-import de.paraplu.cryptocurrency.domain.EnrichedTransferMessage;
+import de.paraplu.cryptocurrency.domain.mongodb.pojo.EnrichedTransferMessage;
 import de.paraplu.cryptocurrency.domain.mongodb.pojo.trigger.TriggerEvent;
 import de.paraplu.cryptocurrency.util.CryptoConverter.EthConverter;
 import lombok.Data;

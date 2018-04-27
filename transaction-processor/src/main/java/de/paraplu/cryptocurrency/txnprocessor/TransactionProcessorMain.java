@@ -23,10 +23,11 @@ import org.web3j.protocol.core.methods.response.Transaction;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-import de.paraplu.cryptocurrency.domain.EnrichedTransferMessage;
 import de.paraplu.cryptocurrency.domain.TransferMessage;
+import de.paraplu.cryptocurrency.domain.mongodb.pojo.EnrichedTransferMessage;
 import de.paraplu.cryptocurrency.domain.mongodb.pojo.TokenInfo;
 import de.paraplu.cryptocurrency.domain.mongodb.pojo.trigger.TriggerEvent;
+import de.paraplu.cryptocurrency.domain.mongodb.repository.EnrichedTransferMessageRepository;
 import de.paraplu.cryptocurrency.domain.mongodb.repository.SyncStatusInfoRepository;
 import de.paraplu.cryptocurrency.domain.mongodb.repository.TokenInfoRepository;
 import de.paraplu.cryptocurrency.domain.mongodb.repository.TriggerEventRepository;
@@ -48,23 +49,26 @@ public class TransactionProcessorMain {
     }
 
     @Autowired
-    private AddressRepository      addressRepository;
+    private AddressRepository                 addressRepository;
 
     @Autowired
-    private TriggerEventRepository triggerEventRepository;
+    private EnrichedTransferMessageRepository enrichedTransferMessageRepository;
 
     @Autowired
-    private TokenInfoRepository    tokenInfoRepository;
+    private TriggerEventRepository            triggerEventRepository;
 
     @Autowired
-    private List<TriggerCheck>     triggerCheckers;
+    private TokenInfoRepository               tokenInfoRepository;
 
     @Autowired
-    private Web3j                  web3;
+    private List<TriggerCheck>                triggerCheckers;
 
-    private void action(List<TriggerEvent> triggerEvents) {
+    @Autowired
+    private Web3j                             web3;
+
+    private void action(List<TriggerEvent> triggerEvents, EnrichedTransferMessage message) {
         triggerEventRepository.saveAll(triggerEvents);
-        // TODO
+        enrichedTransferMessageRepository.save(message);
     }
 
     private EnrichedTransferMessage enrich(TransferMessage transferMessage) throws IOException {
@@ -77,6 +81,7 @@ public class TransactionProcessorMain {
                         .send()
                         .getBlock();
                 EnrichedTransferMessage enrichedTransferMessage = new EnrichedTransferMessage(
+                        result.getHash(),
                         transferMessage,
                         tokenInfoOptional.get(),
                         result,
@@ -110,7 +115,7 @@ public class TransactionProcessorMain {
         store(transferMessage);
         EnrichedTransferMessage enrichedTransferMessage = enrich(transferMessage);
         List<TriggerEvent> triggerEvents = infere(enrichedTransferMessage);
-        action(triggerEvents);
+        action(triggerEvents, enrichedTransferMessage);
         LOGGER.info("[DONE] " + transferMessage.getTransaction());
 
     }

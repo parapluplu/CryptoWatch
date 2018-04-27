@@ -7,7 +7,7 @@ import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import de.paraplu.cryptocurrency.domain.EnrichedTransferMessage;
+import de.paraplu.cryptocurrency.domain.mongodb.pojo.EnrichedTransferMessage;
 import de.paraplu.cryptocurrency.domain.mongodb.pojo.trigger.TriggerCheckPerTokenConfig;
 import de.paraplu.cryptocurrency.domain.mongodb.pojo.trigger.TriggerEvent;
 import de.paraplu.cryptocurrency.domain.mongodb.repository.TriggerCheckPerTokenConfigRepository;

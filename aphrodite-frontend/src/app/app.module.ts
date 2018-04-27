@@ -17,6 +17,7 @@ import { TriggerEventsListComponent } from './trigger-events-list/trigger-events
 import { TriggerEventDetailsComponent } from './trigger-event-details/trigger-event-details.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { GraphComponent } from './graph/graph.component';
+import { EnrichedTransferMessageService } from './shared/enriched-transfer-message/enriched-transfer-message.service';
 
 
 @NgModule({
@@ -35,8 +36,11 @@ import { GraphComponent } from './graph/graph.component';
     CookieModule.forRoot(),
     AppRoutingModule
   ],
-  providers: [TriggerEventsService,
-    TokeninfoService],
+  providers: [
+    TriggerEventsService,
+    TokeninfoService, 
+    EnrichedTransferMessageService
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
