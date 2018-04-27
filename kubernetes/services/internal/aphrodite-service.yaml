@@ -3,7 +3,7 @@ apiVersion: v1
 metadata:
   name: aphrodite
 spec:
-  type: LoadBalancer
+  type: NodePort
   selector:
     service: aphrodite
   ports:
