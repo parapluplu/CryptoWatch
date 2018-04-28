@@ -98,6 +98,5 @@ release:jdk8:
     - docker-compose push
   only:
     - master
-    - develop
   image: docker
 
