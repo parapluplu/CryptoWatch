@@ -26,3 +26,6 @@
     </td>
   </tr>
 </table>
+<ngb-pagination *ngIf="pages && pages > 1" [maxSize]="4" [collectionSize]="collectionSize" [pageSize]="pageSize" [(page)]="page" (pageChange)="update()"
+  [rotate]="true" [ellipses]="false" [boundaryLinks]="true" size="sm">
+</ngb-pagination>
