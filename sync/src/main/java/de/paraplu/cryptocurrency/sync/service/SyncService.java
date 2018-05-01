@@ -117,7 +117,7 @@ public class SyncService {
                 saveTokenInfo(erc20TokenWrapper);
             } catch (ExecutionException | IOException e) {
                 syncStatusInfo.setStatus(SyncStatus.ABORTED);
-                String msg = "Unable to retrieve token details. Won't start syncing";
+                String msg = "Unable to retrieve token details. Won't start syncing. Token info " + token;
                 LOGGER.error(msg, e);
                 throw new SyncServiceException(msg, e);
             }
