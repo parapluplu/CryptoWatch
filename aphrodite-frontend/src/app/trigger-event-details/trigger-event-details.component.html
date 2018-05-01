@@ -23,13 +23,13 @@
 		</tr>
 		<tr>
 			<td>Amount</td>
-			<td>{{data.transferMessage.amount / this.Math.pow(10, data.tokenInfo.decimals)}}
+			<td>{{(data.transferMessage.amount / this.Math.pow(10, data.tokenInfo.decimals)) | number:'1.0-100'}}
 				{{data.tokenInfo.symbol}}
 			</td>
 		</tr>
 		<tr>
 			<td>Gas Price</td>
-			<td>{{data.transactionDetails.gasPrice / 1000000000}} GWEI</td>
+			<td>{{(data.transactionDetails.gasPrice / 1000000000) | number:'1.0-100'}} GWEI</td>
 		</tr>
 		<tr>
 			<td>Date</td>
