@@ -16,7 +16,7 @@ import { TokeninfoService } from './shared/tokeninfo/tokeninfo.service';
 import { TriggerEventsListComponent } from './trigger-events-list/trigger-events-list.component';
 import { TriggerEventDetailsComponent } from './trigger-event-details/trigger-event-details.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
-import { GraphComponent } from './graph/graph.component';
+import { StatsComponent } from './stats/stats.component';
 import { EnrichedTransferMessageService } from './shared/enriched-transfer-message/enriched-transfer-message.service';
 
 
@@ -26,7 +26,7 @@ import { EnrichedTransferMessageService } from './shared/enriched-transfer-messa
     TriggerEventsListComponent,
     TriggerEventDetailsComponent,
     DashboardComponent,
-    GraphComponent
+    StatsComponent
   ],
   imports: [
     BrowserModule,

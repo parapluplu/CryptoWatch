@@ -4,7 +4,7 @@ import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import { DashboardComponent } from './dashboard/dashboard.component';
-import { GraphComponent } from './graph/graph.component';
+import { StatsComponent } from './stats/stats.component';
 
 
 const routes: Routes = [
@@ -12,7 +12,7 @@ const routes: Routes = [
   {path: 'dashboard', component: DashboardComponent},
   {path: 'triggerevents', component: TriggerEventsListComponent},
   {path: 'trigger-event-details/:id', component: TriggerEventDetailsComponent},
-  {path: 'graph', component: GraphComponent}
+  {path: 'stats', component: StatsComponent}
 ];
 
 @NgModule({

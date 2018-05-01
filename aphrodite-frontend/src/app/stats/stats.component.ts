@@ -2,11 +2,11 @@ import { Component, OnInit, ElementRef, AfterViewInit, ViewChild } from '@angula
 import * as Chart from 'chart.js';
 
 @Component({
-  selector: 'app-graph',
-  templateUrl: './graph.component.html',
-  styleUrls: ['./graph.component.css']
+  selector: 'app-stats',
+  templateUrl: './stats.component.html',
+  styleUrls: ['./stats.component.css']
 })
-export class GraphComponent implements AfterViewInit {
+export class StatsComponent implements AfterViewInit {
   @ViewChild('testtest') chartRef: ElementRef;
   constructor(private elementRef: ElementRef) { }
 
