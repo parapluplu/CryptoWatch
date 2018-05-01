@@ -100,6 +100,7 @@ public class TransactionProcessorMain {
     private List<TriggerEvent> infere(EnrichedTransferMessage enriched) throws JsonProcessingException {
         List<TriggerEvent> triggerEvents = new ArrayList<>();
         for (TriggerCheck checker : triggerCheckers) {
+            System.out.println(checker.getClass().getSimpleName());
             Optional<TriggerEvent> event = checker.check(enriched);
             if (event.isPresent()) {
                 triggerEvents.add(event.get());

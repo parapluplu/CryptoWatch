@@ -24,32 +24,30 @@ public class ExchangeTransferTriggerCheck implements TriggerCheck {
 
     @Autowired
     private ExchangeRepository    exchangeRepository;
+    @Autowired
+    private MinAmountTriggerCheck minAmountTriggerCheck;
 
     private Map<String, Exchange> exchanges = new HashMap<>();
 
     @Override
     public Optional<TriggerEvent> check(EnrichedTransferMessage message) {
-        boolean triggered = false;
-        String description = "";
-        Exchange exchange = null;
-        if (exchanges.containsKey(message.getTransferMessage().getFrom())) {
-            triggered = true;
-            description = "<OUT ";
-            exchange = exchanges.get(message.getTransferMessage().getFrom());
-        } else if (exchanges.containsKey(message.getTransferMessage().getTo())) {
-            triggered = true;
-            description = ">IN  ";
-            exchange = exchanges.get(message.getTransferMessage().getTo());
-        }
-        if (triggered) {
-            description += "[" + exchange.getName() + "]";
-            description += NumberFormat.getInstance().format(
-                    CryptoConverter
-                            .normalize(message.getTransferMessage().getAmount(), message.getTokenInfo().getDecimals()));
-            description += " " + message.getTokenInfo().getSymbol();
-            TriggerEvent triggerEvent = TriggerEvent
-                    .txnBasedTriggerEvent("Exchange transfer trigger", description, message);
-            return Optional.of(triggerEvent);
+        Exchange exchangeFrom = exchanges.get(message.getTransferMessage().getFrom());
+        Exchange exchangeTo = exchanges.get(message.getTransferMessage().getTo());
+        if (exchangeFrom != null ^ exchangeTo != null) {
+            Optional<TriggerEvent> minAmountCheck = minAmountTriggerCheck.check(message);
+            if (minAmountCheck.isPresent()) {
+                // only return exchange result, if minimum amount is used
+                String description = "Transfered "
+                        + NumberFormat.getInstance().format(
+                                CryptoConverter.normalize(
+                                        message.getTransferMessage().getAmount(),
+                                        message.getTokenInfo().getDecimals()))
+                        + " " + message.getTokenInfo().getSymbol();
+                description += exchangeFrom != null ? " from " + exchangeFrom.getName() : " to " + exchangeTo.getName();
+                TriggerEvent triggerEvent = TriggerEvent
+                        .txnBasedTriggerEvent("Exchange transfer trigger", description, message);
+                return Optional.of(triggerEvent);
+            }
         }
         return Optional.empty();
     }
@@ -62,9 +60,14 @@ public class ExchangeTransferTriggerCheck implements TriggerCheck {
         }
         exchanges.forEach(exchange -> {
             exchange.getAddresses().forEach(exchangeAddress -> {
-                this.exchanges.put(exchangeAddress, exchange);
+                this.exchanges.put(exchangeAddress.toLowerCase(), exchange);
             });
         });
+        log.info("EXCHANGES: " + this.exchanges);
+    }
+
+    public void setExchanges(Map<String, Exchange> exchanges) {
+        this.exchanges = exchanges;
     }
 
 }

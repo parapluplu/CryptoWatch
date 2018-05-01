@@ -7,7 +7,6 @@ import java.math.BigInteger;
 import java.util.Optional;
 
 import org.junit.Test;
-import org.web3j.protocol.core.methods.response.EthBlock.Block;
 import org.web3j.protocol.core.methods.response.Transaction;
 import org.web3j.utils.Numeric;
 
@@ -15,14 +14,7 @@ import de.paraplu.cryptocurrency.domain.mongodb.pojo.EnrichedTransferMessage;
 import de.paraplu.cryptocurrency.domain.mongodb.pojo.TokenInfo;
 import de.paraplu.cryptocurrency.domain.mongodb.pojo.trigger.TriggerEvent;
 
-public class GasPriceTriggerCheckTest {
-
-    private final static Block DEFAULT_BLOCK;
-
-    static {
-        DEFAULT_BLOCK = new Block();
-        DEFAULT_BLOCK.setTimestamp("0x0");
-    }
+public class GasPriceTriggerCheckTest extends TriggerCheckTest {
 
     @Test
     public void testCheckLess() {

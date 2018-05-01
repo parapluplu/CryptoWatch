@@ -25,7 +25,7 @@ public class MinAmountTriggerCheck extends TriggerCheckPerToken {
                     CryptoConverter.normalize(amount, message.getTokenInfo().getDecimals()).doubleValue());
             final TriggerEvent event = TriggerEvent.txnBasedTriggerEvent(
                     "Minimum amount trigger",
-                    "transfered " + niceAmount + " " + message.getTokenInfo().getSymbol(),
+                    "Transfered " + niceAmount + " " + message.getTokenInfo().getSymbol(),
                     message);
             return Optional.of(event);
         }

@@ -22,7 +22,7 @@ public class GasPriceTriggerCheck implements TriggerCheck {
         if (gasPrice.compareTo(minValue) >= 0) {
             final TriggerEvent event = TriggerEvent.txnBasedTriggerEvent(
                     "Gas Price Trigger",
-                    "txn used a gas price of " + EthConverter.weiToGwei(gasPrice) + " GWEI",
+                    "Txn used a gas price of " + EthConverter.weiToGwei(gasPrice) + " GWEI",
                     message);
             return Optional.of(event);
         }
