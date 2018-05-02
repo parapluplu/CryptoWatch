@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Component;
 
-import de.paraplu.cryptocurrency.sync.service.SyncServiceException;
 import de.paraplu.cryptocurrency.sync.service.SyncServiceManager;
 import lombok.extern.log4j.Log4j2;
 
@@ -34,13 +33,8 @@ public class SyncLifecycle implements SmartLifecycle {
     @Override
     public void start() {
         log.info("Starting sync all");
-        try {
-            syncServiceManager.syncAll();
-            isRunning = true;
-        } catch (SyncServiceException e) {
-            log.error("Error while syncing", e);
-            isRunning = false;
-        }
+        syncServiceManager.syncAll();
+        isRunning = true;
         log.info("Started sync all");
     }
 

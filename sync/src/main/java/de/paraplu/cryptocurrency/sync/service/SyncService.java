@@ -39,6 +39,7 @@ import de.paraplu.cryptocurrency.domain.mongodb.repository.SyncStatusInfoReposit
 import de.paraplu.cryptocurrency.domain.mongodb.repository.TokenInfoRepository;
 import de.paraplu.cryptocurrency.domain.neo4j.pojo.Address;
 import de.paraplu.cryptocurrency.domain.neo4j.pojo.Transfer;
+import lombok.SneakyThrows;
 
 @Component
 public class SyncService {
@@ -99,8 +100,9 @@ public class SyncService {
         tokenInfoRepository.save(tokenInfo);
     }
 
+    @SneakyThrows
     @Async
-    public CompletableFuture<SyncStatusInfo> sync(TokenInfo token) throws SyncServiceException {
+    public CompletableFuture<SyncStatusInfo> sync(TokenInfo token) {
         SyncStatusInfo syncStatusInfoInit = new SyncStatusInfo();
         syncStatusInfoInit.setContractAdress(token.getAddress());
         syncStatusInfoInit.setStatus(SyncStatus.SYNCING);
@@ -137,6 +139,13 @@ public class SyncService {
                 System.out.println("DONE REAL");
                 syncStatusInfo.setCurrentBlock(syncStatusInfo.getTo());
                 syncStatusInfoRepository.save(syncStatusInfo);
+            }).doOnSubscribe(() -> {
+                LOGGER.info("Start syncing " + token.getSymbol());
+            }).doAfterTerminate(() -> {
+                LOGGER.warn(
+                        "TERMINATEDTERMINATEDTERMINATEDTERMINATEDTERMINATEDTERMINATEDTERMINATEDTERMINATEDTERMINATEDTERMINATEDTERMINATEDTERMINATEDTERMINATEDTERMINATEDTERMINATEDTERMINATEDTERMINATEDTERMINATEDTERMINATEDTERMINATEDTERMINATEDTERMINATEDTERMINATEDTERMINATEDTERMINATEDTERMINATEDTERMINATED");
+            }).doOnUnsubscribe(() -> {
+                LOGGER.warn("ASSHOLE UNSUBSCRIBEDUNSUBSCRIBEDUNSUBSCRIBEDUNSUBSCRIBEDUNSUBSCRIBEDUNSUBSCRIBED");
             }).toBlocking().subscribe(log -> {
                 syncStatusInfo.setCurrentBlock(log.getBlockNumber());
                 TransferEventResponse txn = extractTransfer(log);
@@ -151,6 +160,13 @@ public class SyncService {
                 TransferMessage transferMessage = new TransferMessage(transfer);
                 source.output().send(new GenericMessage<>(transferMessage));
                 syncStatusInfo.setCurrentBlock(txn._block);
+                syncStatusInfoRepository.save(syncStatusInfo);
+            }, error -> {
+                successFlag.set(false);
+                sw.stop();
+                sw.getLastTaskTimeMillis();
+                LOGGER.error("Exception while syncing " + syncStatusInfo, error);
+                syncStatusInfo.setStatus(SyncStatus.ABORTED);
                 syncStatusInfoRepository.save(syncStatusInfo);
             });
         } catch (InterruptedException e) {

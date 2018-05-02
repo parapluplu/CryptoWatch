@@ -14,5 +14,5 @@ spring:
       
 web3j:
   client-address: http://localhost:8545
-  httpTimeoutSeconds: 0 
+  httpTimeoutSeconds: 1
       
