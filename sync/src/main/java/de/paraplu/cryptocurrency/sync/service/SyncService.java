@@ -136,16 +136,10 @@ public class SyncService {
                 syncStatusInfo.setStatus(SyncStatus.ABORTED);
                 syncStatusInfoRepository.save(syncStatusInfo);
             }).doOnCompleted(() -> {
-                System.out.println("DONE REAL");
                 syncStatusInfo.setCurrentBlock(syncStatusInfo.getTo());
                 syncStatusInfoRepository.save(syncStatusInfo);
             }).doOnSubscribe(() -> {
                 LOGGER.info("Start syncing " + token.getSymbol());
-            }).doAfterTerminate(() -> {
-                LOGGER.warn(
-                        "TERMINATEDTERMINATEDTERMINATEDTERMINATEDTERMINATEDTERMINATEDTERMINATEDTERMINATEDTERMINATEDTERMINATEDTERMINATEDTERMINATEDTERMINATEDTERMINATEDTERMINATEDTERMINATEDTERMINATEDTERMINATEDTERMINATEDTERMINATEDTERMINATEDTERMINATEDTERMINATEDTERMINATEDTERMINATEDTERMINATEDTERMINATED");
-            }).doOnUnsubscribe(() -> {
-                LOGGER.warn("ASSHOLE UNSUBSCRIBEDUNSUBSCRIBEDUNSUBSCRIBEDUNSUBSCRIBEDUNSUBSCRIBEDUNSUBSCRIBED");
             }).toBlocking().subscribe(log -> {
                 syncStatusInfo.setCurrentBlock(log.getBlockNumber());
                 TransferEventResponse txn = extractTransfer(log);
@@ -165,9 +159,11 @@ public class SyncService {
                 successFlag.set(false);
                 sw.stop();
                 sw.getLastTaskTimeMillis();
-                LOGGER.error("Exception while syncing " + syncStatusInfo, error);
+                LOGGER.error("Exception while syncing " + token.getSymbol(), error);
                 syncStatusInfo.setStatus(SyncStatus.ABORTED);
                 syncStatusInfoRepository.save(syncStatusInfo);
+            }, () -> {
+                LOGGER.info("Completed syncing " + token.getSymbol());
             });
         } catch (InterruptedException e) {
             LOGGER.warn("Syncing process got interrupted for " + syncStatusInfo);
