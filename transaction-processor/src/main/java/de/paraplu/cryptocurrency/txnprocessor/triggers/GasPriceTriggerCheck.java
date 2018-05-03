@@ -14,7 +14,7 @@ import lombok.Data;
 @Data
 public class GasPriceTriggerCheck implements TriggerCheck {
 
-    private BigInteger minValue = BigInteger.valueOf(90000000000l);
+    private BigInteger minValue = BigInteger.valueOf(110000000000l);
 
     @Override
     public Optional<TriggerEvent> check(EnrichedTransferMessage message) {
