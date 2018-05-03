@@ -186,7 +186,17 @@ public final class Erc20TokenWrapper extends Contract {
                 Arrays.<Type>asList(),
                 Arrays.<TypeReference<?>>asList(new TypeReference<Uint8>() {
                 }));
-        return executeCallSingleValueReturn(function);
+        Uint8 ret = executeCallSingleValueReturn(function);
+        if (ret == null) {
+
+            function = new Function(
+                    "DECIMALS",
+                    Arrays.<Type>asList(),
+                    Arrays.<TypeReference<?>>asList(new TypeReference<Uint8>() {
+                    }));
+            ret = executeCallSingleValueReturn(function);
+        }
+        return ret;
     }
 
     public List<ApprovalEventResponse> getApprovalEvents(TransactionReceipt transactionReceipt) {
@@ -252,7 +262,16 @@ public final class Erc20TokenWrapper extends Contract {
                 Arrays.<Type>asList(),
                 Arrays.<TypeReference<?>>asList(new TypeReference<Utf8String>() {
                 }));
-        return executeCallSingleValueReturn(function);
+        Utf8String ret = executeCallSingleValueReturn(function);
+        if (ret == null) {
+            function = new Function(
+                    "SYMBOL",
+                    Arrays.<Type>asList(),
+                    Arrays.<TypeReference<?>>asList(new TypeReference<Utf8String>() {
+                    }));
+            ret = executeCallSingleValueReturn(function);
+        }
+        return ret;
     }
 
     public Future<Uint256> totalSupply() throws IOException {
