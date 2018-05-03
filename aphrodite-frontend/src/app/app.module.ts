@@ -18,6 +18,8 @@ import { TriggerEventDetailsComponent } from './trigger-event-details/trigger-ev
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { StatsComponent } from './stats/stats.component';
 import { EnrichedTransferMessageService } from './shared/enriched-transfer-message/enriched-transfer-message.service';
+import { NgSelectModule } from '@ng-select/ng-select';
+import { FormsModule } from '@angular/forms';
 
 
 @NgModule({
@@ -34,7 +36,9 @@ import { EnrichedTransferMessageService } from './shared/enriched-transfer-messa
     HttpClientModule,
     NgbModule.forRoot(),
     CookieModule.forRoot(),
-    AppRoutingModule
+    AppRoutingModule,
+    NgSelectModule,
+    FormsModule
   ],
   providers: [
     TriggerEventsService,

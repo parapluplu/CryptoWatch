@@ -1,31 +1,40 @@
 <h6>Unusual transactions with ERC-20 tokens</h6>
-<div *ngIf="selectedTokenInfoes">
-  <span *ngFor="let token of availableTokenInfoes">
-    <label>
-      <input type="checkbox" [checked]="selectedTokenInfoes[token] === true" [value]="token" (change)="changeToken(token, $event)"> {{token}}
-    </label>
-  </span>
-</div>
+<div *ngIf="selectedTokens" class="row">
+  <div class="col-sm-8">
+    <ng-select [items]="availableTokenInfoes" [(ngModel)]="selectedTokens" multiple=true (change)="change()"></ng-select>
+  </div>
+  <div class="col-sm-4">
+    <button (click)="selectAll()">Select all</button>
+  </div>
 
-<ngb-pagination *ngIf="pages" [maxSize]="4" [collectionSize]="collectionSize" [pageSize]="pageSize" [(page)]="page" (pageChange)="update()"
-  [rotate]="true" [ellipses]="false" [boundaryLinks]="true" size="sm">
-</ngb-pagination>
-<table class="table table-hover">
-  <thead>
-    <tr>
-      <th scope="col">Detection Date</th>
-      <th scope="col">Event</th>
-    </tr>
-  </thead>
-  <tr *ngFor="let e of triggerEvents">
-    <td>{{e.date.content | date:'short'}}</td>
-    <td>
-      <a routerLink="/trigger-event-details/{{e.id}}">
-        {{e.description}}
-      </a>
-    </td>
-  </tr>
-</table>
-<ngb-pagination *ngIf="pages && pages > 1" [maxSize]="4" [collectionSize]="collectionSize" [pageSize]="pageSize" [(page)]="page" (pageChange)="update()"
-  [rotate]="true" [ellipses]="false" [boundaryLinks]="true" size="sm">
-</ngb-pagination>
+  <!-- <label>
+      <input type="checkbox" [checked]="selectedTokenInfoes[token] === true" [value]="token" (change)="changeToken(token, $event)"> {{token}}
+    </label> -->
+</div>
+<div class="row top-buffer">
+  <div class="col">
+
+    <ngb-pagination *ngIf="pages" [maxSize]="4" [collectionSize]="collectionSize" [pageSize]="pageSize" [(page)]="page" (pageChange)="update()"
+      [rotate]="true" [ellipses]="false" [boundaryLinks]="true" size="sm">
+    </ngb-pagination>
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th scope="col">Detection Date</th>
+          <th scope="col">Event</th>
+        </tr>
+      </thead>
+      <tr *ngFor="let e of triggerEvents">
+        <td>{{e.date.content | date:'short'}}</td>
+        <td>
+          <a routerLink="/trigger-event-details/{{e.id}}">
+            {{e.description}}
+          </a>
+        </td>
+      </tr>
+    </table>
+    <ngb-pagination *ngIf="pages && pages > 1" [maxSize]="4" [collectionSize]="collectionSize" [pageSize]="pageSize" [(page)]="page"
+      (pageChange)="update()" [rotate]="true" [ellipses]="false" [boundaryLinks]="true" size="sm">
+    </ngb-pagination>
+  </div>
+</div>

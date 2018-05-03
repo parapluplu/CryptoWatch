@@ -16,7 +16,7 @@ const SELECTED_TOKENS_COOKIE: string = "SELECTED_TOKENS";
 })
 export class TriggerEventsListComponent implements OnInit {
   availableTokenInfoes: Array<string>;
-  selectedTokenInfoes: {};
+  selectedTokens: Array<string>;
   triggerEvents: Array<any>;
   page: number;
   pageSize: number = 20;
@@ -34,13 +34,10 @@ export class TriggerEventsListComponent implements OnInit {
     this.tokeninfoService.getAll().subscribe(data => {
       this.availableTokenInfoes = data._embedded.tokenInfoes.map(e => e.symbol);
       if(this.cookieService.get(SELECTED_TOKENS_COOKIE) == null) {
-        this.selectedTokenInfoes = {};
-        this.availableTokenInfoes.forEach(token => {
-          this.selectedTokenInfoes[token] = true;
-        });
-        this.cookieService.putObject(SELECTED_TOKENS_COOKIE, this.selectedTokenInfoes);
+        this.selectedTokens = this.availableTokenInfoes;
+        this.cookieService.putObject(SELECTED_TOKENS_COOKIE, this.selectedTokens);
       } else {
-        this.selectedTokenInfoes = <Map<string, boolean>> this.cookieService.getObject(SELECTED_TOKENS_COOKIE);
+        this.selectedTokens = <Array<string>> this.cookieService.getObject(SELECTED_TOKENS_COOKIE);
       }
       this.update();
     });
@@ -48,13 +45,7 @@ export class TriggerEventsListComponent implements OnInit {
 
   update() {
     this.updating = true;
-    const tokens = new Array();
-    Object.entries(this.selectedTokenInfoes).forEach(([key, checked]) => {
-      if(checked === true) {
-        tokens.push(key);
-      }
-    });
-    this.triggerEventsService.getForTokens(tokens, this.page-1, this.pageSize).subscribe(data => {
+    this.triggerEventsService.getForTokens(this.selectedTokens, this.page-1, this.pageSize).subscribe(data => {
       this.page = data.page.number+1;
       this.pages = data.page.totalPages;
       this.collectionSize=data.page.totalElements;
@@ -74,12 +65,19 @@ export class TriggerEventsListComponent implements OnInit {
     this.update();
   }
 
-  changeToken(token: string, event): void {
+  change() {
     this.updating = true;
-    this.selectedTokenInfoes[token] = event.target.checked;
-    this.cookieService.putObject(SELECTED_TOKENS_COOKIE, this.selectedTokenInfoes);
+    this.cookieService.putObject(SELECTED_TOKENS_COOKIE, this.selectedTokens);
     this.page = 1;
     this.update();
   }
+  
+  selectAll() {
+    this.selectedTokens = [];
+    this.availableTokenInfoes.forEach(token => {
+      this.selectedTokens.push(token);
+    });
+    this.change();
+  } 
 
 }
