@@ -21,7 +21,9 @@ import org.web3j.abi.EventEncoder;
 import org.web3j.abi.EventValues;
 import org.web3j.abi.TypeReference;
 import org.web3j.abi.datatypes.Event;
+import org.web3j.abi.datatypes.Utf8String;
 import org.web3j.abi.datatypes.generated.Uint256;
+import org.web3j.abi.datatypes.generated.Uint8;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.request.EthFilter;
@@ -89,13 +91,24 @@ public class SyncService {
             throws InterruptedException, ExecutionException, IOException {
         Optional<TokenInfo> optionalTokenInfo = tokenInfoRepository.findById(erc20TokenWrapper.getContractAddress());
         TokenInfo tokenInfo = optionalTokenInfo.orElse(new TokenInfo(erc20TokenWrapper.getContractAddress()));
-        String symbol = erc20TokenWrapper.symbol().getValue();
-        if (!symbol.trim().isEmpty()) {
-            tokenInfo.setSymbol(symbol);
+        Utf8String symbolRaw = erc20TokenWrapper.symbol();
+        if (symbolRaw != null) {
+            String symbol = symbolRaw.getValue();
+            if (!symbol.trim().isEmpty()) {
+                tokenInfo.setSymbol(symbol);
+            }
+        } else if (tokenInfo.getSymbol() == null) {
+            LOGGER.warn("No symbol retrievable for token " + tokenInfo.getAddress());
         }
-        BigInteger decimals = erc20TokenWrapper.decimals().getValue();
-        if (decimals != null) {
-            tokenInfo.setDecimals(decimals);
+        Uint8 decimalRaw = erc20TokenWrapper.decimals();
+        if (decimalRaw != null) {
+            BigInteger decimals = decimalRaw.getValue();
+            if (decimals != null) {
+                tokenInfo.setDecimals(decimals);
+            }
+        } else if (tokenInfo.getDecimals() == null) {
+            LOGGER.warn(
+                    "No decimals retrievable for token " + tokenInfo.getAddress() + "(" + tokenInfo.getSymbol() + ")");
         }
         tokenInfoRepository.save(tokenInfo);
     }
