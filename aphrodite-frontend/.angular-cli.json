@@ -20,7 +20,8 @@
       "prefix": "app",
       "styles": [
         "styles.css",
-        "assets/bootstrap/css/bootstrap.min.css"
+        "assets/bootstrap/css/bootstrap.min.css",
+        "assets/ng-select/default.theme.scss"
       ],
       "scripts": [],
       "environmentSource": "environments/environment.ts",
