@@ -83,7 +83,7 @@ build angular:5:
     - cd aphrodite-frontend
     - npm install
   script:
-    - ./node_modules/@angular/cli/bin/ng build --prod
+    - ./node_modules/@angular/cli/bin/ng build --prod --build-optimizer=false
   artifacts:
     paths:
       - aphrodite-frontend/dist/
