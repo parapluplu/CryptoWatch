@@ -9,6 +9,7 @@ import org.web3j.protocol.core.methods.response.EthBlock.Block;
 import org.web3j.protocol.core.methods.response.Transaction;
 
 import de.paraplu.cryptocurrency.domain.TransferMessage;
+import de.paraplu.cryptocurrency.util.CryptoConverter;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NonNull;
@@ -27,6 +28,7 @@ public class EnrichedTransferMessage implements Serializable {
     private Transaction       transactionDetails;
     private Block             block;
     private LocalDateTime     blockDate;
+    private double            insecureAmount;
 
     public EnrichedTransferMessage(
             String txnHash,
@@ -39,6 +41,9 @@ public class EnrichedTransferMessage implements Serializable {
         this.transferMessage = transferMessage;
         this.tokenInfo = tokenInfo;
         this.transactionDetails = transactionDetails;
+        this.insecureAmount = CryptoConverter
+                .normalize(transferMessage.getAmount(), tokenInfo.getDecimals())
+                .doubleValue();
         setBlock(block);
     }
 

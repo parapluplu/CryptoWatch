@@ -88,7 +88,7 @@ public class SyncService {
     }
 
     private void saveTokenInfo(Erc20TokenWrapper erc20TokenWrapper)
-            throws InterruptedException, ExecutionException, IOException {
+            throws InterruptedException, ExecutionException, IOException, SyncServiceException {
         Optional<TokenInfo> optionalTokenInfo = tokenInfoRepository.findById(erc20TokenWrapper.getContractAddress());
         TokenInfo tokenInfo = optionalTokenInfo.orElse(new TokenInfo(erc20TokenWrapper.getContractAddress()));
         Utf8String symbolRaw = erc20TokenWrapper.symbol();
@@ -98,7 +98,7 @@ public class SyncService {
                 tokenInfo.setSymbol(symbol);
             }
         } else if (tokenInfo.getSymbol() == null) {
-            LOGGER.warn("No symbol retrievable for token " + tokenInfo.getAddress());
+            throw new SyncServiceException("No symbol retrievable for token " + tokenInfo.getAddress());
         }
         Uint8 decimalRaw = erc20TokenWrapper.decimals();
         if (decimalRaw != null) {
@@ -107,7 +107,7 @@ public class SyncService {
                 tokenInfo.setDecimals(decimals);
             }
         } else if (tokenInfo.getDecimals() == null) {
-            LOGGER.warn(
+            throw new SyncServiceException(
                     "No decimals retrievable for token " + tokenInfo.getAddress() + "(" + tokenInfo.getSymbol() + ")");
         }
         tokenInfoRepository.save(tokenInfo);
@@ -185,7 +185,7 @@ public class SyncService {
             // no need to rethrow, since we are in an async method
         } catch (Exception e) {
             syncStatusInfo.setStatus(SyncStatus.ABORTED);
-            LOGGER.error("Error while syncing", e);
+            LOGGER.error("Error while syncing " + syncStatusInfo, e);
             throw e;
         } finally {
             syncStatusInfoRepository.save(syncStatusInfo);

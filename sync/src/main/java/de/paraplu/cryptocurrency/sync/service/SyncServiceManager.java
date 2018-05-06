@@ -69,6 +69,8 @@ public class SyncServiceManager {
 
     public void syncAll() {
         List<TokenInfo> tokens = tokenInfoRepository.findAll();
+        System.out.println("asfasfasgfagfaslkgjasgklasgj");
+        System.out.println(tokens);
         for (TokenInfo token : tokens) {
             CompletableFuture<SyncStatusInfo> syncProcess = executeActionAsync(token);
             syncProcesses.add(syncProcess);
