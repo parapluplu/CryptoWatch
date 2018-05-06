@@ -51,7 +51,7 @@ export class TriggerEventsListComponent implements OnInit {
       this.pages = data.page.totalPages;
       this.collectionSize = data.page.totalElements;
       this.triggerEvents = data._embedded.triggerEvents;
-      if (this.page > this.pages) {
+      if (this.page > this.pages && this.selectedTokens.length > 0) {
         this.page = this.pages - 1;
         this.update();
       } else {
