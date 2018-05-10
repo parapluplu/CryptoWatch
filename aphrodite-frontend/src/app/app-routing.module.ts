@@ -5,6 +5,8 @@ import {RouterModule, Routes} from '@angular/router';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { StatsComponent } from './stats/stats.component';
+import { AboutComponent } from './about/about.component';
+import { ContactComponent } from './contact/contact.component';
 
 
 const routes: Routes = [
@@ -12,7 +14,8 @@ const routes: Routes = [
   {path: 'dashboard', component: DashboardComponent},
   {path: 'triggerevents', component: TriggerEventsListComponent},
   {path: 'trigger-event-details/:id', component: TriggerEventDetailsComponent},
-  {path: 'stats', component: StatsComponent}
+  {path: 'stats', component: StatsComponent},
+  {path: 'about', component: AboutComponent}
 ];
 
 @NgModule({

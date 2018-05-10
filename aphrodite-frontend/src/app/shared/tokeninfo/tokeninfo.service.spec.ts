@@ -1,6 +1,6 @@
 import { TestBed, inject } from '@angular/core/testing';
 
-import { TriggereventsService } from './tokeninfo.service';
+import { TokeninfoService } from './tokeninfo.service';
 
 describe('TokeninfoService', () => {
   beforeEach(() => {

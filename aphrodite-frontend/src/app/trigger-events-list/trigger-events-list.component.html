@@ -1,18 +1,23 @@
-<h6>Unusual transactions with ERC-20 tokens</h6>
-<div *ngIf="selectedTokens" class="row">
-  <div class="col-sm-8">
-    <ng-select [items]="availableTokenInfoes" [(ngModel)]="selectedTokens" multiple=true (change)="change()"></ng-select>
-  </div>
-  <div class="col-sm-4">
-    <button (click)="selectAll()">Select all</button>
-  </div>
+<div class="row">
+  <div class="col-md-12 col-md-offset-7">
 
-  <!-- <label>
-      <input type="checkbox" [checked]="selectedTokenInfoes[token] === true" [value]="token" (change)="changeToken(token, $event)"> {{token}}
-    </label> -->
+    <div *ngIf="selectedTokens" class="row">
+      <div class="col-sm-8">
+        <ng-select [items]="availableTokenInfoes" [(ngModel)]="selectedTokens" multiple=true (change)="change()"></ng-select>
+      </div>
+      <div class="col-sm-4">
+        <button (click)="selectAll()">Select all</button>
+      </div>
+
+      <!-- <label>
+          <input type="checkbox" [checked]="selectedTokenInfoes[token] === true" [value]="token" (change)="changeToken(token, $event)"> {{token}}
+        </label> -->
+    </div>
+  </div>
 </div>
 <div class="row top-buffer">
-  <div class="col">
+  <div class="col-sm-8">
+    <h6>Unusual transactions with ERC-20 tokens</h6>
 
     <ngb-pagination *ngIf="pages" [maxSize]="4" [collectionSize]="collectionSize" [pageSize]="pageSize" [(page)]="page" (pageChange)="update()"
       [rotate]="true" [ellipses]="false" [boundaryLinks]="true" size="sm">
@@ -36,5 +41,21 @@
     <ngb-pagination *ngIf="pages && pages > 1" [maxSize]="4" [collectionSize]="collectionSize" [pageSize]="pageSize" [(page)]="page"
       (pageChange)="update()" [rotate]="true" [ellipses]="false" [boundaryLinks]="true" size="sm">
     </ngb-pagination>
+  </div>
+  <div class="col-sm-4">
+    <br><br>
+    <h6>Statistics</h6>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Symbol</th>
+          <th>Events in the past 7 days</th>
+        </tr>
+      </thead>
+      <tr *ngFor="let e of txnSummary">
+        <td>{{e._id.symbol}}</td>
+        <td>{{e.count}}</td>
+      </tr>
+    </table>
   </div>
 </div>
