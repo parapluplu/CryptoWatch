@@ -1,0 +1,4 @@
+{
+    "port": 8080,
+    "config-server-uri": "http://config-server:8888"
+}

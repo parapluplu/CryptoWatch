@@ -1,0 +1,4 @@
+{
+    "port": 8081,
+    "config-server-uri": "http://localhost:8080"
+}
