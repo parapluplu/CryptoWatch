@@ -17,6 +17,7 @@ if (process.env.NODE_ENV) {
 }
 configClient.load({
     name: "application",
+    endpoint : localConfig.get("config-server-uri"),
     profiles: profile
 }).then((config) => {
     const mongoUri = config.get("spring.data.mongodb.uri");

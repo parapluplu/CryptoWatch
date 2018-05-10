@@ -16,4 +16,6 @@ COPY . .
 
 EXPOSE 8080
 
-CMD [ "npm", "start" ]
+ENV NODE_ENV=production
+
+CMD [ "npm", "start"]

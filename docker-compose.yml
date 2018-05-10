@@ -34,6 +34,13 @@ services:
     image: registry.gitlab.com/cryptocurrencytracker/zeus/aphrodite-frontend
     links:
       - aphrodite
+  messy-aphrodite:
+    build:
+      context: messy-aphrodite/
+    image: registry.gitlab.com/cryptocurrencytracker/zeus/messy-aphrodite
+    links:
+      - mongo
+      - config-server
   config-server:
     build: 
       context: config-server/
