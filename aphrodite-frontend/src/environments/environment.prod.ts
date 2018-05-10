@@ -1,6 +1,6 @@
 export const environment = {
   production: true,
 
-  statApiUrl: '/statApi',
+  statApiUrl: '/statsApi',
   apiUrl: '/api'
 };
