@@ -22,7 +22,6 @@ spec:
         - --unsafe-expose
         image: parity/parity:stable
         name: parity
-        resources: {}
         volumeMounts:
         - mountPath: /var/lib/parity/data
           name: parity-data
@@ -31,6 +30,7 @@ spec:
         resources:
           requests:
             memory: "4Gi"
+            cpu: 1
       restartPolicy: Always
       volumes:
       - name: parity-data

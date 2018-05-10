@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: frontent-nginx-configmap
+  name: frontend-nginx-configmap
 data:
   nginx.conf: |
     events {
@@ -17,6 +17,9 @@ data:
         }
         location /api {
             proxy_pass http://aphrodite:8080/;
+            limit_except GET {
+                deny all;
+            }
         }
       }
     }
