@@ -1,0 +1,23 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    service: messy-aphrodite
+  name: messy-aphrodite
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        service: messy-aphrodite
+    spec:
+      containers:
+      - image: registry.gitlab.com/cryptocurrencytracker/zeus/messy-aphrodite
+        name: messy-aphrodite
+        resources: {}
+      imagePullSecrets:
+      - name: regcred
+      restartPolicy: Always
+status: {}
