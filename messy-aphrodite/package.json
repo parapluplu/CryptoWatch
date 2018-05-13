@@ -1,0 +1,20 @@
+{
+  "name": "messy-aphrodite",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cloud-config-client": "^1.2.0",
+    "config": "^1.30.0",
+    "cors": "^2.8.4",
+    "dotenv": "^5.0.1",
+    "express": "^4.16.3",
+    "helmet": "^3.12.0",
+    "mongodb": "^3.0.7"
+  }
+}

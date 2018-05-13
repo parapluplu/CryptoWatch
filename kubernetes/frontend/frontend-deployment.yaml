@@ -16,9 +16,12 @@ spec:
       containers:
       - image: registry.gitlab.com/cryptocurrencytracker/zeus/aphrodite-frontend
         name: frontend
-        resources: {}
+        resources: 
+          requests:
+            cpu: "200m"
+            memory: "1G"
         volumeMounts:
-          - name: frontent-nginx-configmap
+          - name: frontend-configmap
             mountPath: /etc/nginx/nginx.conf
             subPath: nginx.conf
         ports:
@@ -27,7 +30,7 @@ spec:
       - name: regcred
       restartPolicy: Always
       volumes:
-        - name: frontent-nginx-configmap
+        - name: frontend-configmap
           configMap:
-            name: frontent-nginx-configmap
+            name: frontend-configmap
 status: {}

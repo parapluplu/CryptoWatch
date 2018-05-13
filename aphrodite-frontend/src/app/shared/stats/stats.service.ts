@@ -4,19 +4,15 @@ import {Observable} from 'rxjs/Observable';
 import { environment } from '../../../environments/environment';
 
 @Injectable()
-export class TokeninfoService {
+export class StatsService {
 
   constructor(private http: HttpClient) {}
 
-  getAll(): Observable<any> {
-    return this.http.get(environment.apiUrl + '/api/tokenInfoes', {
+  getTxnSummary(tokens: Array<string>): Observable<any> {
+    return this.http.get(environment.statApiUrl + '/txnSummary', {
       params: {
-        size: "1000"
+        tokenSymbols: tokens.join(',')
       }
     });
-  }
-
-  getById(id: string): Observable<any> {
-    return this.http.get(environment.apiUrl + '/api/tokenInfoes/' + id);
   }
 }

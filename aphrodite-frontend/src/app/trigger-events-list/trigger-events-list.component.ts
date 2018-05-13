@@ -6,6 +6,7 @@ import { TokeninfoService } from '../shared/tokeninfo/tokeninfo.service';
 import { TriggerEventDetailsComponent } from '../trigger-event-details/trigger-event-details.component';
 import { ActivatedRoute } from '@angular/router';
 import { CookieService } from 'ngx-cookie';
+import { StatsService } from '../shared/stats/stats.service';
 
 const SELECTED_TOKENS_COOKIE: string = "SELECTED_TOKENS";
 
@@ -15,6 +16,7 @@ const SELECTED_TOKENS_COOKIE: string = "SELECTED_TOKENS";
   styleUrls: ['./trigger-events-list.component.css']
 })
 export class TriggerEventsListComponent implements OnInit {
+  txnSummary: Array<any>;
   availableTokenInfoes: Array<string>;
   selectedTokens: Array<string>;
   triggerEvents: Array<any>;
@@ -28,11 +30,14 @@ export class TriggerEventsListComponent implements OnInit {
   constructor(private triggerEventsService: TriggerEventsService,
     private tokeninfoService: TokeninfoService,
     private route: ActivatedRoute,
-    private cookieService: CookieService) { }
+    private cookieService: CookieService,
+    private statsService: StatsService
+  ) { }
 
   ngOnInit() {
     this.tokeninfoService.getAll().subscribe(data => {
       this.availableTokenInfoes = data._embedded.tokenInfoes.map(e => e.symbol);
+      this.availableTokenInfoes.sort();
       if (this.cookieService.get(SELECTED_TOKENS_COOKIE) == null) {
         this.selectedTokens = this.availableTokenInfoes;
         this.saveCookie(this.selectedTokens);
@@ -55,6 +60,17 @@ export class TriggerEventsListComponent implements OnInit {
         this.page = this.pages - 1;
         this.update();
       } else {
+        this.statsService.getTxnSummary(this.selectedTokens).subscribe(txnSummary => {
+          this.txnSummary = txnSummary;
+          this.txnSummary.sort(function(a,b) {
+            if(a._id.symbol < b._id.symbol) {
+              return -1;
+            } else if(a._id.symbol > b._id.symbol) {
+              return 1;
+            }
+            return 0;
+          });
+        });
         this.updating = false;
       }
     });

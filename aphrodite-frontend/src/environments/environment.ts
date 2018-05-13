@@ -6,5 +6,6 @@
 export const environment = {
   production: false,
 
+  statApiUrl: '//localhost:8081',
   apiUrl: '//localhost:8080'
 };

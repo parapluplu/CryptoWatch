@@ -17,7 +17,10 @@ spec:
       containers:
       - image: mongo:3
         name: mongodb
-        resources: {}
+        resources: 
+          requests:
+            memory: "4G"
+            cpu: 1
         volumeMounts:
         - mountPath: /data/db
           name: mongodb-data
