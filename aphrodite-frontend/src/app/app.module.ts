@@ -20,7 +20,7 @@ import { StatsComponent } from './stats/stats.component';
 import { EnrichedTransferMessageService } from './shared/enriched-transfer-message/enriched-transfer-message.service';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { FormsModule } from '@angular/forms';
-import { AdsenseModule } from 'ng2-adsense';
+// import { AdsenseModule } from 'ng2-adsense';
 import { AboutComponent } from './about/about.component';
 import { ContactComponent } from './contact/contact.component';
 import { MatIconModule} from "@angular/material";
@@ -48,9 +48,9 @@ import { StatsService } from './shared/stats/stats.service';
     AppRoutingModule,
     NgSelectModule,
     FormsModule,
-    AdsenseModule.forRoot({
-      adClient: 'ca-pub-6710819307817843'
-    }),
+    // AdsenseModule.forRoot({
+    //   adClient: 'ca-pub-6710819307817843'
+    // }),
     MatIconModule
   ],
   providers: [
