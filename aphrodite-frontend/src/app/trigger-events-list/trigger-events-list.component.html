@@ -44,17 +44,21 @@
   </div>
   <div class="col-sm-4">
     <br><br>
-    <h6>Statistics</h6>
+    <h6>Statistics of past 7 days</h6>
     <table class="table">
       <thead>
         <tr>
           <th>Symbol</th>
-          <th>Events in the past 7 days</th>
+          <th>Exchange withdraws</th>
+          <th>Exchange deposits</th>
+          <th># txns</th>
         </tr>
       </thead>
       <tr *ngFor="let e of txnSummary">
         <td>{{e._id.symbol}}</td>
-        <td>{{e.count}}</td>
+        <td>{{e.exchange_out}} {{e._id.symbol}}</td>
+        <td>{{e.exchange_in}} {{e._id.symbol}}</td>
+        <td>{{e.txns}}</td>
       </tr>
     </table>
   </div>
