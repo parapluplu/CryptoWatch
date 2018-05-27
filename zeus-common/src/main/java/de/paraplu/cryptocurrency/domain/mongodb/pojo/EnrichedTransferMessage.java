@@ -8,6 +8,7 @@ import org.springframework.data.annotation.Id;
 import org.web3j.protocol.core.methods.response.EthBlock.Block;
 import org.web3j.protocol.core.methods.response.Transaction;
 
+import de.paraplu.cryptocurrency.domain.ExchangeInformation;
 import de.paraplu.cryptocurrency.domain.TransferMessage;
 import de.paraplu.cryptocurrency.util.CryptoConverter;
 import lombok.AccessLevel;
@@ -17,18 +18,19 @@ import lombok.Setter;
 
 @Data
 public class EnrichedTransferMessage implements Serializable {
-    private static final long serialVersionUID = 1L;
+    private static final long   serialVersionUID = 1L;
 
     @Id
     @Setter(AccessLevel.NONE)
     @NonNull
-    private String            txnHash;
-    private TransferMessage   transferMessage;
-    private TokenInfo         tokenInfo;
-    private Transaction       transactionDetails;
-    private Block             block;
-    private LocalDateTime     blockDate;
-    private double            insecureAmount;
+    private String              txnHash;
+    private TransferMessage     transferMessage;
+    private TokenInfo           tokenInfo;
+    private Transaction         transactionDetails;
+    private Block               block;
+    private LocalDateTime       blockDate;
+    private double              insecureAmount;
+    private ExchangeInformation exchange;
 
     public EnrichedTransferMessage(
             String txnHash,

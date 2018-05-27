@@ -11,6 +11,7 @@ import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import de.paraplu.cryptocurrency.domain.ExchangeInformation;
 import de.paraplu.cryptocurrency.domain.mongodb.pojo.EnrichedTransferMessage;
 import de.paraplu.cryptocurrency.domain.mongodb.pojo.Exchange;
 import de.paraplu.cryptocurrency.domain.mongodb.pojo.trigger.TriggerEvent;
@@ -43,7 +44,23 @@ public class ExchangeTransferTriggerCheck implements TriggerCheck {
                                         message.getTransferMessage().getAmount(),
                                         message.getTokenInfo().getDecimals()))
                         + " " + message.getTokenInfo().getSymbol();
-                description += exchangeFrom != null ? " from " + exchangeFrom.getName() : " to " + exchangeTo.getName();
+                ExchangeInformation exchangeInformation;
+                if (exchangeFrom != null) {
+                    description += " from " + exchangeFrom.getName();
+                    exchangeInformation = new ExchangeInformation(
+                            false,
+                            true,
+                            message.getTransferMessage().getFrom(),
+                            exchangeFrom.getName());
+                } else {
+                    description += " to " + exchangeTo.getName();
+                    exchangeInformation = new ExchangeInformation(
+                            true,
+                            false,
+                            message.getTransferMessage().getTo(),
+                            exchangeTo.getName());
+                }
+                message.setExchange(exchangeInformation);
                 TriggerEvent triggerEvent = TriggerEvent
                         .txnBasedTriggerEvent("Exchange transfer trigger", description, message);
                 return Optional.of(triggerEvent);
